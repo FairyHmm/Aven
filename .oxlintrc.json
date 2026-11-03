@@ -1,0 +1,43 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "options": {
+    "typeAware": true
+  },
+  "plugins": ["eslint", "typescript", "unicorn", "oxc", "promise", "import"],
+  "ignorePatterns": [
+    "**/dist/**",
+    "**/node_modules/**",
+    "**/.wrangler/**",
+    "**/.firebase/**",
+    "**/*.d.ts",
+    "**/routeTree.gen.ts",
+    "**/pnpm-lock.yaml"
+  ],
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "typescript/no-explicit-any": "error",
+    "typescript/no-unsafe-assignment": "error",
+    "typescript/no-unsafe-argument": "error",
+    "typescript/no-unsafe-member-access": "error",
+    "typescript/no-unsafe-call": "error",
+    "typescript/no-unsafe-return": "error",
+    "typescript/no-unsafe-type-assertion": "error",
+    "typescript/no-unnecessary-type-assertion": "error",
+    "typescript/strict-boolean-expressions": "warn",
+    "typescript/no-confusing-void-expression": "error",
+    "typescript/consistent-return": "error",
+    "typescript/no-misused-spread": "error",
+    "eslint/no-shadow": "error",
+    "import/no-cycle": "error",
+    "import/no-duplicates": "error",
+    "eqeqeq": ["error", "always"],
+    "no-else-return": "error",
+    "prefer-const": "error",
+    "max-lines": ["error", { "max": 200 }],
+    "max-params": ["error", 6],
+    "max-depth": ["error", 5],
+    "complexity": ["error", 20]
+  }
+}
