@@ -1,10 +1,7 @@
-import { Text } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/")({
-  component: HomePage,
-});
+import { SpacesPage } from "../features/space/components/SpacesPage";
 
-function HomePage() {
-  return <Text>Your spaces.</Text>;
-}
+export const Route = createFileRoute("/")({
+  component: SpacesPage,
+});

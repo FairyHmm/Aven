@@ -14,7 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as GTokenRouteImport } from './routes/g.$token'
 import { Route as SSpaceIdRouteImport } from './routes/s.$spaceId'
 import { Route as SSpaceIdIndexRouteImport } from './routes/s.$spaceId.index'
-import { Route as SSpaceIdTabIdRouteImport } from './routes/s.$spaceId.$tabId'
+import { Route as SSpaceIdBoardIdRouteImport } from './routes/s.$spaceId.$boardId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -41,9 +41,9 @@ const SSpaceIdIndexRoute = SSpaceIdIndexRouteImport.update({
   path: '/',
   getParentRoute: () => SSpaceIdRoute,
 } as any)
-const SSpaceIdTabIdRoute = SSpaceIdTabIdRouteImport.update({
-  id: '/$tabId',
-  path: '/$tabId',
+const SSpaceIdBoardIdRoute = SSpaceIdBoardIdRouteImport.update({
+  id: '/$boardId',
+  path: '/$boardId',
   getParentRoute: () => SSpaceIdRoute,
 } as any)
 
@@ -52,14 +52,14 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/g/$token': typeof GTokenRoute
   '/s/$spaceId': typeof SSpaceIdRouteWithChildren
-  '/s/$spaceId/$tabId': typeof SSpaceIdTabIdRoute
+  '/s/$spaceId/$boardId': typeof SSpaceIdBoardIdRoute
   '/s/$spaceId/': typeof SSpaceIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/g/$token': typeof GTokenRoute
-  '/s/$spaceId/$tabId': typeof SSpaceIdTabIdRoute
+  '/s/$spaceId/$boardId': typeof SSpaceIdBoardIdRoute
   '/s/$spaceId': typeof SSpaceIdIndexRoute
 }
 export interface FileRoutesById {
@@ -68,7 +68,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/g/$token': typeof GTokenRoute
   '/s/$spaceId': typeof SSpaceIdRouteWithChildren
-  '/s/$spaceId/$tabId': typeof SSpaceIdTabIdRoute
+  '/s/$spaceId/$boardId': typeof SSpaceIdBoardIdRoute
   '/s/$spaceId/': typeof SSpaceIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -78,17 +78,17 @@ export interface FileRouteTypes {
     | '/login'
     | '/g/$token'
     | '/s/$spaceId'
-    | '/s/$spaceId/$tabId'
+    | '/s/$spaceId/$boardId'
     | '/s/$spaceId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/g/$token' | '/s/$spaceId/$tabId' | '/s/$spaceId'
+  to: '/' | '/login' | '/g/$token' | '/s/$spaceId/$boardId' | '/s/$spaceId'
   id:
     | '__root__'
     | '/'
     | '/login'
     | '/g/$token'
     | '/s/$spaceId'
-    | '/s/$spaceId/$tabId'
+    | '/s/$spaceId/$boardId'
     | '/s/$spaceId/'
   fileRoutesById: FileRoutesById
 }
@@ -136,23 +136,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SSpaceIdIndexRouteImport
       parentRoute: typeof SSpaceIdRoute
     }
-    '/s/$spaceId/$tabId': {
-      id: '/s/$spaceId/$tabId'
-      path: '/$tabId'
-      fullPath: '/s/$spaceId/$tabId'
-      preLoaderRoute: typeof SSpaceIdTabIdRouteImport
+    '/s/$spaceId/$boardId': {
+      id: '/s/$spaceId/$boardId'
+      path: '/$boardId'
+      fullPath: '/s/$spaceId/$boardId'
+      preLoaderRoute: typeof SSpaceIdBoardIdRouteImport
       parentRoute: typeof SSpaceIdRoute
     }
   }
 }
 
 interface SSpaceIdRouteChildren {
-  SSpaceIdTabIdRoute: typeof SSpaceIdTabIdRoute
+  SSpaceIdBoardIdRoute: typeof SSpaceIdBoardIdRoute
   SSpaceIdIndexRoute: typeof SSpaceIdIndexRoute
 }
 
 const SSpaceIdRouteChildren: SSpaceIdRouteChildren = {
-  SSpaceIdTabIdRoute: SSpaceIdTabIdRoute,
+  SSpaceIdBoardIdRoute: SSpaceIdBoardIdRoute,
   SSpaceIdIndexRoute: SSpaceIdIndexRoute,
 }
 

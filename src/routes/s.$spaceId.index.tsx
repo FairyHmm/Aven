@@ -1,12 +1,20 @@
-import { Text } from "@mantine/core";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
-// Space with no tab selected; later this redirects to the first tab.
+import { NoBoards } from "../features/space/components/NoBoards";
+import { findSpace } from "../shared/lib/fixtures";
+
+// A space always opens on its first board; there is no "space, no board" view.
 export const Route = createFileRoute("/s/$spaceId/")({
-  component: SpaceIndexPage,
+  beforeLoad: ({ params }) => {
+    const first = findSpace(params.spaceId)?.boards[0];
+    if (first === undefined) {
+      return;
+    }
+    throw redirect({
+      to: "/s/$spaceId/$boardId",
+      params: { spaceId: params.spaceId, boardId: first.id },
+      replace: true,
+    });
+  },
+  component: NoBoards,
 });
-
-function SpaceIndexPage() {
-  const { spaceId } = Route.useParams();
-  return <Text>Space {spaceId}</Text>;
-}

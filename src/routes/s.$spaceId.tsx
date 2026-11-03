@@ -1,10 +1,7 @@
-import { Outlet, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 
-// Space layout: sidebar, tab bar and the per-space subscriptions go here.
+import { SpaceLayout } from "../features/space/components/SpaceLayout";
+
 export const Route = createFileRoute("/s/$spaceId")({
   component: SpaceLayout,
 });
-
-function SpaceLayout() {
-  return <Outlet />;
-}

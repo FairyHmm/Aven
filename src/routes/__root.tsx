@@ -1,7 +1,7 @@
-import { Text } from "@mantine/core";
+import { AppShell, Text } from "@mantine/core";
 import { Outlet, createRootRoute } from "@tanstack/react-router";
 
-import { AppShell } from "../shared/components/AppShell";
+import { AppHeader } from "../app/AppHeader";
 
 export const Route = createRootRoute({
   component: RootLayout,
@@ -10,8 +10,13 @@ export const Route = createRootRoute({
 
 function RootLayout() {
   return (
-    <AppShell>
-      <Outlet />
+    <AppShell header={{ height: 56 }} padding="md">
+      <AppShell.Header>
+        <AppHeader />
+      </AppShell.Header>
+      <AppShell.Main>
+        <Outlet />
+      </AppShell.Main>
     </AppShell>
   );
 }
