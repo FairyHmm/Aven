@@ -1,0 +1,230 @@
+/* Sortable wrapper: the flex item in the lane. */
+.slot {
+  flex: 0 0 280px;
+  width: 280px;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: calc(100dvh - 200px);
+  padding: 8px;
+  background: var(--color-bg-card);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  transition:
+    background var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+
+/* A card is being dragged over this column. */
+.column[data-over="true"] {
+  background: color-mix(in oklab, var(--color-bg-card) 90%, white);
+  border-color: color-mix(
+    in oklab,
+    var(--color-primary-hover) 55%,
+    transparent
+  );
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  cursor: grab;
+  gap: 8px;
+  min-height: 28px;
+  padding-left: 4px;
+}
+
+.dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 18%, transparent);
+}
+
+.name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.nameInput {
+  flex: 1;
+  min-width: 0;
+  padding: 3px 6px;
+  margin: -4px -7px;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+  background: var(--color-bg-deep);
+  border: 1px solid var(--color-primary-hover);
+  border-radius: 6px;
+  outline: none;
+}
+
+.count {
+  min-width: 22px;
+  padding: 1px 7px;
+  font-size: 0.72rem;
+  text-align: center;
+  background: color-mix(in oklab, white 7%, transparent);
+  border-radius: 999px;
+  color: var(--color-ac);
+  font-variant-numeric: tabular-nums;
+}
+
+.list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  /* Scrolling clips at its edge: this room keeps the landing glow around the
+     cards visible. The negative margin cancels it out, so nothing moves. */
+  padding: 4px;
+  margin: -4px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--color-border) 50%, transparent)
+    transparent;
+}
+
+.empty {
+  display: grid;
+  place-items: center;
+  min-height: 56px;
+  transition: min-height var(--dur) var(--ease);
+  font-size: 0.8rem;
+  color: var(--color-ac);
+  border: 1px dashed color-mix(in oklab, var(--color-border) 45%, transparent);
+  border-radius: 8px;
+}
+
+.addButton,
+.addColumn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--color-ac);
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  transition:
+    color var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease);
+}
+
+.addButton:hover,
+.addColumn:hover {
+  color: var(--color-text);
+  background: color-mix(in oklab, white 6%, transparent);
+}
+
+.addButton:focus-visible,
+.addColumn:focus-visible {
+  outline: 2px solid var(--color-primary-hover);
+  outline-offset: 1px;
+}
+
+.addColumn:hover {
+  border-color: color-mix(in oklab, var(--color-border) 80%, transparent);
+}
+
+.addColumn {
+  flex: 0 0 280px;
+  width: 280px;
+  height: 40px;
+  justify-content: center;
+  border: 1px dashed color-mix(in oklab, var(--color-border) 45%, transparent);
+  border-radius: 10px;
+}
+
+.composer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: pop-in 180ms var(--ease) both;
+}
+
+.composerRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.newColumn {
+  display: flex;
+  flex: 0 0 280px;
+  flex-direction: column;
+  gap: 8px;
+  width: 280px;
+  padding: 8px;
+  background: var(--color-bg-card);
+  border-radius: 10px;
+  animation: pop-in 180ms var(--ease) both;
+}
+
+/* Colour swatches inside the column menu. */
+.swatches {
+  display: flex;
+  gap: 8px;
+  padding: 6px 12px;
+}
+
+.swatch {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  cursor: pointer;
+  background: var(--accent);
+  border: 2px solid transparent;
+  border-radius: 50%;
+  transition: transform var(--dur-fast) var(--ease);
+}
+
+.swatch:hover {
+  transform: scale(1.15);
+}
+
+.swatch[data-active="true"] {
+  border-color: var(--color-text);
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .column,
+  .addButton,
+  .addColumn,
+  .swatch {
+    transition: none;
+  }
+
+  .composer,
+  .newColumn {
+    animation: none;
+  }
+}

@@ -1,9 +1,10 @@
-import { Stack, Text, Title } from "@mantine/core";
+import { Text } from "@mantine/core";
 import { useParams } from "@tanstack/react-router";
 
 import { findBoard } from "../../../shared/lib/fixtures";
+import { BoardView } from "./BoardView";
 
-// Board view. Placeholder until the board surface lands.
+// Board route component: resolves the board, then hands over to the surface.
 export function BoardPage() {
   const { spaceId, boardId } = useParams({ from: "/s/$spaceId/$boardId" });
   const board = findBoard(spaceId, boardId);
@@ -12,12 +13,5 @@ export function BoardPage() {
     return <Text c="dimmed">Board not found.</Text>;
   }
 
-  return (
-    <Stack gap="xs">
-      <Title order={3}>{board.name}</Title>
-      <Text size="sm" c="dimmed">
-        The board surface goes here.
-      </Text>
-    </Stack>
-  );
+  return <BoardView spaceId={spaceId} boardId={boardId} name={board.name} />;
 }
