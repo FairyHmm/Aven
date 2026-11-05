@@ -1,0 +1,28 @@
+/* Sortable items (shared/components/SortableItem.tsx): the wrapper opens a gap with its margins while
+   something is dragged over its list. Closing the gap on drop must be instant,
+   or the dropped item's neighbours would bounce. */
+[data-sortable-item] {
+  transition:
+    margin var(--dur) var(--ease),
+    max-height var(--dur) var(--ease),
+    max-width var(--dur) var(--ease);
+}
+
+body[data-dropping] [data-sortable-item] {
+  transition: none;
+}
+
+/* The item being dragged leaves no placeholder: a clone follows the pointer
+   and the item itself is unseen. It collapses out of its list with the same
+   animated margin that opens the gap (see SortableItem), and stays unseen
+   after the drop until the clone has landed on it. */
+[data-sortable-item][data-dragging] {
+  pointer-events: none;
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-sortable-item] {
+    transition: none;
+  }
+}

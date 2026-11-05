@@ -11,9 +11,9 @@ importers:
       '@atlaskit/pragmatic-drag-and-drop':
         specifier: ^4.0.0
         version: 4.0.0
-      '@atlaskit/pragmatic-drag-and-drop-hitbox':
-        specifier: ^3.0.0
-        version: 3.0.0
+      '@atlaskit/pragmatic-drag-and-drop-auto-scroll':
+        specifier: ^3.2.1
+        version: 3.2.1
       '@codemirror/lang-markdown':
         specifier: ^6.5.2
         version: 6.5.2
@@ -120,8 +120,8 @@ packages:
   '@apidevtools/json-schema-ref-parser@9.1.2':
     resolution: {integrity: sha512-r1w81DpR+KyRWd3f+rk6TNqMgedmAxZP5v5KWlXQWlgMUUtyEJch0DKEci1SorPMiSeM8XPl7MZ3miJ60JIpQg==}
 
-  '@atlaskit/pragmatic-drag-and-drop-hitbox@3.0.0':
-    resolution: {integrity: sha512-AGLp1ewjm07eRN2NL62awllSM19FrWVZMQYfZA/jugQlpaeoTr5ah2DE7zfiEt7yrg34htoKQVM+y6SGIQYs2A==}
+  '@atlaskit/pragmatic-drag-and-drop-auto-scroll@3.2.1':
+    resolution: {integrity: sha512-2fhWAG48EjPoKhoHLG6RcT3/VaCzYEbRb6BtA/Vcfx4FrL0P1KrEgBJ6OAwB0X8MOV6UH22YgjFFHjv8fQD9rA==}
 
   '@atlaskit/pragmatic-drag-and-drop@4.0.0':
     resolution: {integrity: sha512-pyDo2B5NiaExoKGmgeXKGNUL4aR4UzzSZm8QWWjYTEyBLVqSqKyKUwtVxMw2YEkakagOGFONUdHM32LAH2nPug==}
@@ -5274,7 +5274,7 @@ snapshots:
       call-me-maybe: 1.0.2
       js-yaml: 4.3.2
 
-  '@atlaskit/pragmatic-drag-and-drop-hitbox@3.0.0':
+  '@atlaskit/pragmatic-drag-and-drop-auto-scroll@3.2.1':
     dependencies:
       '@atlaskit/pragmatic-drag-and-drop': 4.0.0
       '@babel/runtime': 7.29.10
