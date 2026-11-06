@@ -23,9 +23,12 @@
   "dependencies": {
     "@atlaskit/pragmatic-drag-and-drop": "^4.0.0",
     "@atlaskit/pragmatic-drag-and-drop-auto-scroll": "^3.2.1",
+    "@codemirror/commands": "^6.11.1",
     "@codemirror/lang-markdown": "^6.5.2",
+    "@codemirror/language": "^6.13.1",
     "@codemirror/state": "^6.7.6",
     "@codemirror/view": "^6.43.15",
+    "@lezer/highlight": "^1.2.5",
     "@mantine/core": "^9.7.4",
     "@mantine/hooks": "^9.7.4",
     "@tanstack/react-router": "^1.170.46",
@@ -37,6 +40,7 @@
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-markdown": "^10.1.0",
+    "rehype-callouts": "^2.2.0",
     "remark-frontmatter": "^5.0.0",
     "remark-gfm": "^4.0.1",
     "zustand": "^5.0.16"
@@ -44,6 +48,8 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20261102.1",
     "@tanstack/router-plugin": "^1.168.48",
+    "@types/hast": "^3.0.5",
+    "@types/mdast": "^4.0.4",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.2.1",
