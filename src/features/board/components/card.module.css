@@ -43,6 +43,11 @@
   transition-duration: 60ms;
 }
 
+/* Pressing a control inside the card must not shift it from under the pointer. */
+.card:has([role="checkbox"]:active) {
+  transform: translateY(-1px);
+}
+
 .card:focus-visible {
   outline: 2px solid var(--color-primary-hover);
   outline-offset: 1px;
@@ -56,16 +61,20 @@
   overflow-wrap: anywhere;
 }
 
-.snippet {
-  display: -webkit-box;
-  margin: 0;
+/* The card's markdown, read-only and clamped; a click opens the editor, so
+   links inside are inert here. */
+.body {
+  max-height: 11rem;
   overflow: hidden;
   font-size: 0.8rem;
-  line-height: 1.45;
-  color: var(--color-text-subtle);
-  opacity: 0.75;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+}
+
+.body[data-clamped] {
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 1.5rem), transparent);
+}
+
+.body a {
+  pointer-events: none;
 }
 
 .meta {
@@ -74,6 +83,22 @@
   gap: 6px;
   margin-top: 2px;
   font-size: 0.72rem;
+  color: var(--color-ac);
+}
+
+.preview {
+  font-size: 0.9rem;
+  min-height: 11rem;
+  max-height: 52vh;
+  padding: 12px 14px;
+  overflow: auto;
+  background: var(--color-bg-deep);
+  border: 1px solid color-mix(in oklab, var(--color-border) 35%, transparent);
+  border-radius: 8px;
+}
+
+.empty {
+  font-size: 0.85rem;
   color: var(--color-ac);
 }
 

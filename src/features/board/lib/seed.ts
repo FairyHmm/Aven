@@ -54,6 +54,12 @@ export function seedBoard(now = Date.now()): BoardData {
         "Kanban board surface",
         "Columns, cards, drag and drop, local or Firebase storage.",
       ),
+      card(
+        doing,
+        1,
+        "Card pipeline",
+        "A card is markdown; a mermaid code fence turns it into a diagram.\n\n```mermaid\nflowchart LR\n  Write --> Preview --> Share\n```",
+      ),
       card(done, 0, "Scaffold the app", "React + Mantine + TanStack Router."),
     ],
   };

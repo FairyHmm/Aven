@@ -1,17 +1,22 @@
 import {
   Button,
   Group,
+  Input,
   Modal,
+  SegmentedControl,
   Stack,
-  Textarea,
   TextInput,
 } from "@mantine/core";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 
+import { CodeEditor } from "../../editor/components/CodeEditor";
+import { MarkdownView } from "../../editor/components/MarkdownView";
 import { useBoardActions } from "../hooks/useBoardActions";
 import { useEditedCard } from "../hooks/useCardEditor";
 import type { Card } from "../lib/types";
+
+import classes from "./card.module.css";
 
 // The editor of whichever card is open (see stores/editorStore.ts); renders
 // nothing while none is.
@@ -25,12 +30,13 @@ export function CardEditorModal() {
 
 type Props = { card: Card; onClose: () => void };
 
-// Plain markdown editing for now; the CodeMirror live preview replaces the
-// textarea when the editor feature lands.
+// Title plus a CodeMirror markdown body; "Preview" renders it the way a
+// reader sees it, mermaid diagrams included.
 function EditorDialog({ card, onClose }: Props) {
   const { editCard, removeCard } = useBoardActions();
   const [title, setTitle] = useState(card.title);
   const [body, setBody] = useState(card.body);
+  const [mode, setMode] = useState("write");
 
   const save = () => {
     editCard(card.id, { title, body });
@@ -64,20 +70,38 @@ function EditorDialog({ card, onClose }: Props) {
             setTitle(event.currentTarget.value);
           }}
         />
-        <Textarea
+        <Input.Wrapper
           label="Body"
           description="Markdown. Ctrl/⌘ + Enter to save."
-          autosize
-          minRows={8}
-          maxRows={18}
-          value={body}
-          styles={{
-            input: { fontFamily: "var(--mantine-font-family-monospace)" },
-          }}
-          onChange={event => {
-            setBody(event.currentTarget.value);
-          }}
-        />
+        >
+          <SegmentedControl
+            size="xs"
+            mt={6}
+            mb={6}
+            data={[
+              { value: "write", label: "Write" },
+              { value: "preview", label: "Preview" },
+            ]}
+            value={mode}
+            onChange={setMode}
+          />
+          {mode === "write" ? (
+            <CodeEditor
+              initialValue={body}
+              label="Card body"
+              onChange={setBody}
+              onSubmit={save}
+            />
+          ) : (
+            <div className={classes.preview}>
+              {body.trim() === "" ? (
+                <span className={classes.empty}>Nothing to preview.</span>
+              ) : (
+                <MarkdownView body={body} onBodyChange={setBody} />
+              )}
+            </div>
+          )}
+        </Input.Wrapper>
         <Group justify="space-between" mt="xs">
           <Button
             variant="subtle"

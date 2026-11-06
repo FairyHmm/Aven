@@ -1,7 +1,11 @@
-import { AlignLeft } from "lucide-react";
+import { AlignLeft, Workflow } from "lucide-react";
+import { useRef } from "react";
 
+import { MarkdownView } from "../../editor/components/MarkdownView";
+import { useBoardActions } from "../hooks/useBoardActions";
 import { useOpenCard } from "../hooks/useCardEditor";
-import { snippet } from "../lib/snippet";
+import { useClamped } from "../hooks/useClamped";
+import { cardKind } from "../lib/kind";
 import { ago } from "../lib/time";
 import type { Card } from "../lib/types";
 
@@ -9,7 +13,9 @@ import classes from "./card.module.css";
 
 export function CardTile({ card }: { card: Card }) {
   const open = useOpenCard();
-  const preview = snippet(card.body);
+  const { editCard } = useBoardActions();
+  const body = useRef<HTMLDivElement>(null);
+  const clamped = useClamped(body);
 
   return (
     <div
@@ -27,9 +33,26 @@ export function CardTile({ card }: { card: Card }) {
       }}
     >
       <span className={classes.title}>{card.title}</span>
-      {preview !== "" && <p className={classes.snippet}>{preview}</p>}
+      {card.body !== "" && (
+        <div
+          ref={body}
+          className={classes.body}
+          data-clamped={clamped ? "" : undefined}
+        >
+          <MarkdownView
+            body={card.body}
+            onBodyChange={next => {
+              editCard(card.id, { title: card.title, body: next });
+            }}
+          />
+        </div>
+      )}
       <div className={classes.meta}>
-        {card.body !== "" && <AlignLeft size={12} aria-label="Has notes" />}
+        {cardKind(card.body) === "diagram" ? (
+          <Workflow size={12} aria-label="Diagram" />
+        ) : (
+          card.body !== "" && <AlignLeft size={12} aria-label="Has notes" />
+        )}
         <span>{ago(card.updatedAt)}</span>
       </div>
     </div>
