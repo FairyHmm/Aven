@@ -2,6 +2,7 @@ import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element
 import { useEffect, useState, type RefObject } from "react";
 
 import { listData, liftedSize, readItem, type Axis } from "../lib/dnd/data";
+import { pendingDrag } from "../lib/dnd/press";
 import { dropIndex } from "../lib/dnd/reorder";
 import { useDragStore } from "../stores/dragStore";
 
@@ -51,6 +52,9 @@ export function useSortableList(
         setOver(true);
       },
       onDrag: ({ location, source }) => {
+        if (pendingDrag.has(source.element)) {
+          return;
+        }
         const { clientX, clientY } = location.current.input;
         const pointer = vertical ? clientY : clientX;
         const lifted = liftedSize.get(source.element);
