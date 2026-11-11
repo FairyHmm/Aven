@@ -35,6 +35,9 @@ importers:
       '@mantine/core':
         specifier: ^9.7.4
         version: 9.7.4(@mantine/hooks@9.7.4(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@mantine/dates':
+        specifier: ^9.7.5
+        version: 9.7.5(@mantine/core@9.7.4(@mantine/hooks@9.7.4(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(@mantine/hooks@9.7.4(react@19.3.1))(dayjs@1.11.23)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@mantine/hooks':
         specifier: ^9.7.4
         version: 9.7.4(react@19.3.1)
@@ -44,6 +47,9 @@ importers:
       '@trystero-p2p/firebase':
         specifier: ^0.26.0
         version: 0.26.0
+      dayjs:
+        specifier: ^1.11.23
+        version: 1.11.23
       firebase:
         specifier: ^13.1.0
         version: 13.1.0
@@ -74,6 +80,9 @@ importers:
       remark-gfm:
         specifier: ^4.0.1
         version: 4.0.1(supports-color@10.2.2)
+      yaml:
+        specifier: ^2.9.1
+        version: 2.9.1
       zustand:
         specifier: ^5.0.16
         version: 5.0.16(@types/react@19.3.0)(react@19.3.1)(use-sync-external-store@1.7.0(react@19.3.1))
@@ -81,6 +90,9 @@ importers:
       '@cloudflare/workers-types':
         specifier: ^5.20261102.1
         version: 5.20261102.1
+      '@codebend3r/gale':
+        specifier: ^0.4.1
+        version: 0.4.1
       '@tanstack/router-plugin':
         specifier: ^1.168.48
         version: 1.168.48(@tanstack/react-router@1.170.46(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(esbuild@0.28.2)(rolldown@1.2.16)(supports-color@10.2.2)(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.2(postcss@8.5.32))(yaml@2.9.1))
@@ -278,6 +290,11 @@ packages:
 
   '@cloudflare/workers-types@5.20261102.1':
     resolution: {integrity: sha512-rRNznLGla+8vRdToTN/5M+AzlopILSLLZ3qo2L5Ku/dY792iOlX/K9ZLkLnLYji1jycv7+FB12hiE+fFjVgMrw==}
+
+  '@codebend3r/gale@0.4.1':
+    resolution: {integrity: sha512-bKoYT7FbqndDxUnmoCVnmJ1+2Gx/d0rhGFJORvWFE++k+NGFBC7mD97wI2J28Li9YJInmhf9SXR90cS/olIoRg==}
+    engines: {node: '>=20.0.0'}
+    hasBin: true
 
   '@codemirror/autocomplete@6.20.4':
     resolution: {integrity: sha512-yF8RhOf2SXlg00+qtupzLhrglcas61boqaONiNcbPIebHCpJocpqTBA6dyrtUrQO47hqyTdeob/3XnYilT7TaQ==}
@@ -1235,6 +1252,15 @@ packages:
     resolution: {integrity: sha512-c7aTGELNn74CxG9i5/tq9BHGh0lKdKmGGz+9iDF+gR7Ipt4U1TMM286lAmLpRrKL2bR+UEaN4blZ8UJmOuGJ4Q==}
     peerDependencies:
       '@mantine/hooks': 9.7.4
+      react: ^19.2.0
+      react-dom: ^19.2.0
+
+  '@mantine/dates@9.7.5':
+    resolution: {integrity: sha512-5gCln+ZUzlyW0muMp+E+XA3udnPGdA2gaP2LE6Y6qWt3jJiDN/gyXX1supXWexZ7JTLnaQeYb1LDyNz8J92apA==}
+    peerDependencies:
+      '@mantine/core': 9.7.5
+      '@mantine/hooks': 9.7.5
+      dayjs: '>=1.0.0'
       react: ^19.2.0
       react-dom: ^19.2.0
 
@@ -5482,6 +5508,8 @@ snapshots:
 
   '@cloudflare/workers-types@5.20261102.1': {}
 
+  '@codebend3r/gale@0.4.1': {}
+
   '@codemirror/autocomplete@6.20.4':
     dependencies:
       '@codemirror/language': 6.13.1
@@ -6673,6 +6701,15 @@ snapshots:
       type-fest: 5.10.0
     transitivePeerDependencies:
       - '@types/react'
+
+  '@mantine/dates@9.7.5(@mantine/core@9.7.4(@mantine/hooks@9.7.4(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(@mantine/hooks@9.7.4(react@19.3.1))(dayjs@1.11.23)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+    dependencies:
+      '@mantine/core': 9.7.4(@mantine/hooks@9.7.4(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@mantine/hooks': 9.7.4(react@19.3.1)
+      clsx: 2.1.1
+      dayjs: 1.11.23
+      react: 19.3.1
+      react-dom: 19.3.1(react@19.3.1)
 
   '@mantine/hooks@9.7.4(react@19.3.1)':
     dependencies:
