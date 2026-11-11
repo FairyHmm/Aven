@@ -32,6 +32,23 @@ type Options = {
   disabled?: boolean | undefined;
 };
 
+// A drag takes the pointer away from whatever was being typed into. Blurring
+// it first lets that field save (and shrink back) before the item is measured
+// and lifted.
+function releaseFocus(element: HTMLElement) {
+  const focused = document.activeElement;
+  const typing =
+    focused instanceof HTMLElement &&
+    (focused.isContentEditable ||
+      focused instanceof HTMLInputElement ||
+      focused instanceof HTMLTextAreaElement);
+  if (typing && element.contains(focused)) {
+    flushSync(() => {
+      focused.blur();
+    });
+  }
+}
+
 // Makes an element draggable. The browser's drag image is replaced by a
 // floating clone that swings with the pointer (see dragLayer.ts).
 export function useSortableItem(
@@ -107,6 +124,7 @@ export function useSortableItem(
         disableNativeDragPreview({ nativeSetDragImage });
       },
       onDragStart: ({ location }) => {
+        releaseFocus(element);
         const held = takePress();
         if (held !== undefined) {
           // Pressed on a small control: wait for real movement (see press.ts).

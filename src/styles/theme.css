@@ -46,15 +46,28 @@
   --font-size-xl: 1.25rem;
   --font-size-2xl: 1.75rem;
 
+  /* Spacing: gaps between things, on a 4px grid */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+
   /* Border Radius */
   --radius-sm: 0.125rem; /* 2px */
   --radius-md: 0.5rem; /* 4px */
   --radius-lg: 0.75rem; /* 6px */
 
-  /* Motion */
+  /* Motion: three timings, nothing else (shared/lib/motion.ts reads them for
+     what is animated from code). fast: colour, fades, presses. dur: things
+     appearing, leaving, resizing. dur-spatial: shapes on the spring. */
   --ease: cubic-bezier(0.2, 0, 0, 1);
   --dur-fast: 120ms;
   --dur: 200ms;
+
+  /* Material 3 Expressive: shapes and positions move on a spring that
+     overshoots a little; opacity only fades. */
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-spatial: 420ms;
 
   /* Column accents (small status dots) */
   --accent-indigo: oklch(72% 0.17 277);
@@ -83,4 +96,54 @@
 }
 [data-accent="violet"] {
   --accent: var(--accent-violet);
+}
+
+/* Label colours (Trello palette): ten hues in three tones. An element tagged
+   with data-hue and data-tone exposes --label and the --label-ink to write on
+   it; see features/board/lib/labels/labelColors.ts. */
+[data-hue] {
+  --chroma: 1;
+}
+[data-hue="green"] {
+  --hue: 160;
+}
+[data-hue="yellow"] {
+  --hue: 95;
+}
+[data-hue="orange"] {
+  --hue: 55;
+}
+[data-hue="red"] {
+  --hue: 25;
+}
+[data-hue="purple"] {
+  --hue: 305;
+}
+[data-hue="blue"] {
+  --hue: 255;
+}
+[data-hue="sky"] {
+  --hue: 215;
+}
+[data-hue="lime"] {
+  --hue: 125;
+}
+[data-hue="pink"] {
+  --hue: 350;
+}
+[data-hue="gray"] {
+  --hue: 255;
+  --chroma: 0.12;
+}
+[data-tone="subtle"] {
+  --label: oklch(40% calc(0.08 * var(--chroma)) var(--hue));
+  --label-ink: oklch(95% 0.02 var(--hue));
+}
+[data-tone="regular"] {
+  --label: oklch(56% calc(0.14 * var(--chroma)) var(--hue));
+  --label-ink: oklch(98% 0.01 var(--hue));
+}
+[data-tone="bold"] {
+  --label: oklch(76% calc(0.16 * var(--chroma)) var(--hue));
+  --label-ink: oklch(22% 0.05 var(--hue));
 }

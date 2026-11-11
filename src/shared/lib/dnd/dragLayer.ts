@@ -1,3 +1,4 @@
+import { ms } from "../motion";
 import { EASE, holdRect } from "./flip";
 
 export type DragLayer = {
@@ -48,6 +49,19 @@ export function createDragLayer(
       element.removeAttribute(attribute);
     }
   }
+  // What only matters in place (the controls of a row that is not its text) is
+  // left out of the picture, and the shadow goes on the part that is the thing
+  // itself: a row is dragged as its bar, not as the room around it. They are
+  // hidden, not removed, so the bar keeps the size it has in the list: it does
+  // not stretch over their room when lifted, or shrink back on landing.
+  for (const element of node.querySelectorAll<HTMLElement>(
+    "[data-drag-hide]",
+  )) {
+    element.style.visibility = "hidden";
+  }
+  const body = node.querySelector<HTMLElement>("[data-drag-body]") ?? node;
+  body.style.boxShadow =
+    "0 18px 32px -10px rgb(0 0 0 / 0.6), 0 2px 6px rgb(0 0 0 / 0.3)";
   Object.assign(node.style, {
     position: "fixed",
     left: "0",
@@ -60,7 +74,6 @@ export function createDragLayer(
     transition: "none",
     transformOrigin: `${origin.x}px ${origin.y}px`,
     willChange: "transform",
-    boxShadow: "0 18px 32px -10px rgb(0 0 0 / 0.6), 0 2px 6px rgb(0 0 0 / 0.3)",
   });
   document.body.append(node);
 
@@ -107,7 +120,7 @@ export function createDragLayer(
             transform: `translate3d(${to.left}px, ${to.top}px, 0) rotate(0deg)`,
           },
         ],
-        { duration: 260, easing: EASE, fill: "forwards" },
+        { duration: ms("base"), easing: EASE, fill: "forwards" },
       );
       animation.onfinish = done;
     },

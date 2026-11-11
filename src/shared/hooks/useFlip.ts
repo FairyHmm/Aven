@@ -6,6 +6,7 @@ import {
   prefersReducedMotion,
   takeFrom,
 } from "../lib/dnd/flip";
+import { ms } from "../lib/motion";
 
 type Options = {
   // Stagger for the entrance when the whole board has just loaded.
@@ -46,7 +47,7 @@ export function useFlip(
               { transform: `translate(${dx}px, ${dy}px)` },
               { transform: "translate(0, 0)" },
             ],
-            { duration: 260, easing: EASE },
+            { duration: ms("base"), easing: EASE },
           );
         }
       }
@@ -57,7 +58,7 @@ export function useFlip(
           { opacity: 1, transform: "translateY(0)" },
         ],
         {
-          duration: 320,
+          duration: ms("base"),
           easing: EASE,
           delay: isSettling() ? delay : 0,
           fill: "backwards",
