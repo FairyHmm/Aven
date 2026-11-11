@@ -1,0 +1,122 @@
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* What is added to the card back while it is open comes in on the spring. */
+.sections[data-live] :is(.row, .fields, .toggles, .sectionValue) > * {
+  transition:
+    opacity var(--dur-fast) linear,
+    transform var(--dur-spatial) var(--spring);
+}
+
+@starting-style {
+  .sections[data-live] :is(.row, .fields, .toggles, .sectionValue) > * {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+}
+
+/* Labels and the date, side by side and lined up on their tops. */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md) var(--space-lg);
+  align-items: flex-start;
+}
+
+/* Custom fields: equal cells, so the controls line up under each other. */
+.fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: var(--space-md) var(--space-lg);
+}
+
+.sectionLabel {
+  display: flex;
+  align-items: center;
+  margin: 0 0 var(--space-xs);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-ac);
+}
+
+.sectionValue {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.section {
+  min-width: 0;
+}
+
+/* A custom field: its name over a control for its value. */
+.field {
+  min-width: 0;
+}
+
+/* Checkboxes are small: one line each, side by side, not a grid cell. */
+.toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm) var(--space-lg);
+}
+
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fieldRemove {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  margin-left: 4px;
+  color: var(--color-ac);
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-radius: 3px;
+  opacity: 0;
+}
+
+.fieldRemove:hover {
+  color: var(--color-danger);
+}
+
+.fieldRemove:focus-visible {
+  opacity: 1;
+}
+
+.toggle .sectionLabel {
+  margin: 0;
+}
+
+/* Out in the gap beside the checkbox, so it takes no room of its own. */
+.toggle .fieldRemove {
+  position: absolute;
+  inset-inline-end: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.field:hover .fieldRemove,
+.section:hover .fieldRemove {
+  opacity: 1;
+}
+
+.contents {
+  display: contents;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sections[data-live] :is(.row, .fields, .toggles, .sectionValue) > * {
+    transition: none;
+  }
+}

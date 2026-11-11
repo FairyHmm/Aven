@@ -1,0 +1,106 @@
+/* The progress section: the count and a bar under it. */
+.progress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: 32px;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
+
+.progress[data-complete] {
+  color: var(--color-success);
+}
+
+.progressTrack {
+  width: 120px;
+  height: 6px;
+  overflow: hidden;
+  background: var(--color-bg-hover);
+  border-radius: 3px;
+}
+
+.progressFill {
+  display: block;
+  height: 100%;
+  background: currentcolor;
+  border-radius: 3px;
+  transition: width var(--dur) var(--ease);
+}
+
+.progressNote {
+  display: flex;
+  align-items: center;
+  min-height: 32px;
+  font-size: 0.85rem;
+  color: var(--color-ac);
+}
+
+/* Card-back label bar. */
+.label {
+  min-width: 48px;
+  height: 32px;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--label-ink);
+  cursor: pointer;
+  background: var(--label);
+  border: none;
+  border-radius: 4px;
+}
+
+.label:hover,
+.label:focus-visible {
+  filter: brightness(1.12);
+}
+
+.add {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  color: var(--color-text);
+  cursor: pointer;
+  background: var(--color-bg-hover);
+  border: none;
+  border-radius: 4px;
+}
+
+.add:hover,
+.add:focus-visible {
+  background: var(--color-border);
+}
+
+.date {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 10px;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--color-text);
+  cursor: pointer;
+  background: var(--color-bg-hover);
+  border: none;
+  border-radius: 4px;
+}
+
+.date:hover,
+.date:focus-visible {
+  background: var(--color-border);
+}
+
+.overdue {
+  padding: 0 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1.6;
+  color: var(--color-danger);
+  background: color-mix(in oklab, var(--color-danger) 20%, transparent);
+  border-radius: 3px;
+}
