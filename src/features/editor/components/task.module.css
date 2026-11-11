@@ -1,6 +1,3 @@
-/* The box takes the width of a bullet marker (1.4em), so a task's text lines
-   up with plain bullets. An unchecked task has no box until it is hovered:
-   its text starts at the left edge and the box slides out, pushing it. */
 .task {
   display: flex;
   align-items: flex-start;
@@ -16,13 +13,12 @@
   transition: width var(--dur) var(--ease);
 }
 
-.target:has(.box[data-state=" "]) {
+.target[data-empty] {
   width: 0;
 }
 
-.task:hover .target:has(.box[data-state=" "]),
-.target:has(.box[data-state=" "]:focus-visible),
-.target:has(.box[data-state=" "][data-open]) {
+.target[data-empty][data-reveal],
+.task:hover .target[data-empty] {
   width: 1.4em;
 }
 
@@ -39,220 +35,19 @@
   margin-bottom: 0;
 }
 
-/* The circle is a layer of its own (`::before` the ring, `::after` the half
-   fill of "in progress") so that going to or from a bare icon can fade and
-   scale it instead of switching shape in one frame. */
-.box {
-  position: relative;
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  width: 1.05em;
-  height: 1.05em;
-  margin: 0.28em 0 0;
-  padding: 0;
-  color: var(--color-bg-deep);
-  cursor: pointer;
-  background: none;
-  border: 0;
-  transition:
-    transform var(--dur) var(--ease),
-    opacity var(--dur) var(--ease),
-    color var(--dur-fast) var(--ease);
-}
-
-.box::before,
-.box::after {
-  position: absolute;
-  inset: 0;
-  box-sizing: border-box;
-  pointer-events: none;
-  content: "";
-  border-radius: 50%;
-  transition:
-    opacity var(--dur) var(--ease),
-    transform var(--dur) var(--ease),
-    background-color var(--dur-fast) var(--ease),
-    border-color var(--dur-fast) var(--ease);
-}
-
-.box::before {
-  background-color: var(--state, transparent);
-  border: 1.5px solid var(--state, var(--color-ac));
-}
-
-.box::after {
-  background: linear-gradient(
-    135deg,
-    var(--state, transparent) 50%,
-    transparent 50%
-  );
-  opacity: 0;
-}
-
-/* The glyph sits above the circle layers and pops in when the state changes. */
-.box > svg {
-  position: relative;
-  z-index: 1;
-}
-
-.box[data-animate] > svg {
-  animation: pop var(--dur) var(--ease);
-}
-
-@keyframes pop {
-  from {
-    opacity: 0;
-    transform: scale(0.5);
-  }
-}
-
-.box:disabled {
-  cursor: default;
-}
-
-/* Unchecked: out of sight (and out of reach) until the item is hovered or
-   focused, then it slides out of the gutter's edge. */
-.box[data-state=" "] {
-  pointer-events: none;
-  opacity: 0;
-  transform: translateX(-60%) scale(0.6);
-}
-
-.task:hover .box[data-state=" "],
-.box[data-state=" "]:focus-visible,
-.box[data-state=" "][data-open] {
-  pointer-events: auto;
-  opacity: 1;
-  transform: none;
-}
-
-.task:hover .box[data-state=" "]:enabled:hover::before {
-  border-color: var(--color-text-subtle);
-}
-
-.box:focus-visible {
-  outline: 2px solid var(--color-primary-hover);
-  outline-offset: 1px;
-}
-
-.box[data-state="x"],
-.glyph[data-state="x"] {
-  --state: var(--color-success);
-}
-.box[data-state=">"],
-.glyph[data-state=">"] {
-  --state: var(--color-incomplete);
-}
-.box[data-state="<"],
-.glyph[data-state="<"] {
-  --state: var(--accent-violet);
-}
-.box[data-state="!"],
-.glyph[data-state="!"] {
-  --state: var(--color-warning);
-}
-.box[data-state="-"],
-.glyph[data-state="-"] {
-  --state: var(--color-fg);
-}
-.box[data-state="/"],
-.glyph[data-state="/"] {
-  --state: var(--color-warning);
-}
-.box[data-state="?"],
-.glyph[data-state="?"] {
-  --state: var(--accent-indigo);
-}
-.box[data-state="n"],
-.glyph[data-state="n"] {
-  --state: var(--color-incomplete);
-}
-
-/* In progress: the circle is filled diagonally, one half only. */
-.glyph[data-state="/"] {
-  background: linear-gradient(135deg, var(--state) 50%, transparent 50%);
-}
-
-.box[data-state="/"]::before {
-  background-color: transparent;
-}
-
-.box[data-state="/"]::after {
-  opacity: 1;
-}
-
-/* Every state but the four circles is a bare filled icon: no ring, the icon
-   takes the whole box. The ring layers shrink away rather than vanish. */
-.box[data-shape="icon"] {
-  color: var(--state);
-}
-
-.box[data-shape="icon"]::before,
-.box[data-shape="icon"]::after {
-  opacity: 0;
-  transform: scale(0.5);
-}
-
-.glyph[data-shape="icon"] {
-  color: var(--state);
-  background: none;
-  border: 0;
-  border-radius: 0;
-}
-
-/* The inner strokes of a filled icon (the question mark, the calendar's
-   header line, the plane's fold) are cut out in the surface colour. */
-.box[data-state="?"] path,
-.glyph[data-state="?"] path,
-.box[data-state="<"] path:last-child,
-.glyph[data-state="<"] path:last-child,
-.box[data-state=">"] path:last-child,
-.glyph[data-state=">"] path:last-child {
-  stroke: var(--color-bg-deep);
-}
-
-/* A cancelled task reads as struck out. */
-.task:has(> .target > .box[data-state="-"]) .content {
+.task[data-cancelled] .content {
   color: var(--color-ac);
   text-decoration: line-through;
 }
 
-.glyph {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  color: var(--color-bg-deep);
-  background: var(--state, transparent);
-  border: 1.5px solid var(--state, var(--color-ac));
-  border-radius: 50%;
-}
-
-/* No hover on touch screens: keep the unchecked box visible there. */
 @media (hover: none) {
-  .target:has(.box[data-state=" "]) {
+  .target[data-empty] {
     width: 1.4em;
-  }
-
-  .box[data-state=" "] {
-    pointer-events: auto;
-    opacity: 1;
-    transform: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .target,
-  .box,
-  .box::before,
-  .box::after {
+  .target {
     transition: none;
-  }
-
-  .box[data-animate] > svg {
-    animation: none;
   }
 }

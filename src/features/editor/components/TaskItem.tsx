@@ -14,7 +14,9 @@ import { pressControl } from "../../../shared/lib/dnd/press";
 import { isRound, TASK_STATES, type TaskState, toggled } from "../lib/tasks";
 import { TaskMark } from "./TaskMark";
 
-import classes from "./task.module.css";
+import task from "./task.module.css";
+import boxStyles from "./taskBox.module.css";
+import glyphStyles from "./taskGlyph.module.css";
 
 // Set by a MarkdownView that can write changes back; without it the boxes are
 // read-only.
@@ -22,8 +24,6 @@ export const TaskContext = createContext<
   ((offset: number, state: TaskState) => void) | undefined
 >(undefined);
 
-// Nothing in here may reach the card tile around it: a click would open the
-// editor and Enter/Space on the box would too.
 function contained(event: MouseEvent | KeyboardEvent) {
   event.stopPropagation();
 }
@@ -33,13 +33,12 @@ type Props = { state: TaskState; offset: number; children: ReactNode };
 export function TaskItem({ state, offset, children }: Props) {
   const change = useContext(TaskContext);
   const [open, setOpen] = useState(false);
-  // The state under the pointer in the menu: shown on the box (and the text)
-  // until the pointer moves on, but never written.
   const [preview, setPreview] = useState<TaskState>();
   const pressed = useRef(false);
-  const shown = preview ?? state;
-  // The glyph only pops in once the box has changed after mounting, so a page
-  // full of tasks doesn't animate on load.
+  const contextMenu = useRef(false);
+  // Only show preview while the menu is open; late hover/focus during fade-out
+  // must not leave a stale preview on the box.
+  const shown = open ? (preview ?? state) : state;
   const [last, setLast] = useState(shown);
   const [changed, setChanged] = useState(false);
   if (last !== shown) {
@@ -47,16 +46,29 @@ export function TaskItem({ state, offset, children }: Props) {
     setChanged(true);
   }
   const label = TASK_STATES.find(item => item.char === shown)?.label ?? "";
+  const empty = shown === " ";
+  const cancelled = shown === "-";
+  const reveal = open || pressed.current;
 
   return (
-    <li className={classes.task}>
+    <li
+      className={task.task}
+      data-task=""
+      data-cancelled={cancelled ? "" : undefined}
+    >
       <Menu
         opened={open}
         onChange={next => {
-          setOpen(next);
-          if (!next) {
-            setPreview(undefined);
+          // Only open from an explicit context menu; left click toggles the box.
+          if (next) {
+            if (!contextMenu.current) {
+              return;
+            }
+            contextMenu.current = false;
           }
+          setOpen(next);
+          // Clear preview on both open and close so nothing stale carries over.
+          setPreview(undefined);
         }}
         position="bottom-start"
         shadow="md"
@@ -64,7 +76,11 @@ export function TaskItem({ state, offset, children }: Props) {
         disabled={change === undefined}
       >
         <Menu.Target>
-          <span className={classes.target}>
+          <span
+            className={task.target}
+            data-empty={empty ? "" : undefined}
+            data-reveal={empty && reveal ? "" : undefined}
+          >
             <button
               type="button"
               role="checkbox"
@@ -73,7 +89,7 @@ export function TaskItem({ state, offset, children }: Props) {
               }
               aria-label={label}
               title={label}
-              className={classes.box}
+              className={boxStyles.box}
               data-state={shown}
               data-shape={isRound(shown) ? "round" : "icon"}
               data-animate={changed ? "" : undefined}
@@ -83,8 +99,6 @@ export function TaskItem({ state, offset, children }: Props) {
                 pressed.current = false;
               }}
               onPointerUp={() => {
-                // Toggle on release rather than on `click`: a click is not
-                // reliably delivered to a button inside a draggable item.
                 if (pressed.current) {
                   pressed.current = false;
                   change?.(offset, toggled(state));
@@ -92,16 +106,12 @@ export function TaskItem({ state, offset, children }: Props) {
               }}
               onClick={event => {
                 contained(event);
-                // Mouse and touch toggled on release; this is the keyboard
-                // (Enter/Space), which reports no click position.
                 if (event.detail === 0) {
                   change?.(offset, toggled(state));
                 }
               }}
               onKeyDown={contained}
               onPointerDown={event => {
-                // Only the primary button presses the box; a right click
-                // opens the menu and must not toggle it.
                 if (event.button !== 0) {
                   return;
                 }
@@ -113,6 +123,7 @@ export function TaskItem({ state, offset, children }: Props) {
               onContextMenu={event => {
                 event.preventDefault();
                 contained(event);
+                contextMenu.current = true;
                 setOpen(true);
               }}
             >
@@ -133,7 +144,7 @@ export function TaskItem({ state, offset, children }: Props) {
               key={item.char}
               leftSection={
                 <span
-                  className={classes.glyph}
+                  className={glyphStyles.glyph}
                   data-state={item.char}
                   data-shape={isRound(item.char) ? "round" : "icon"}
                 >
@@ -142,10 +153,10 @@ export function TaskItem({ state, offset, children }: Props) {
               }
               rightSection={item.char === state ? <Check size={14} /> : null}
               onMouseEnter={() => {
-                setPreview(item.char);
+                if (open) setPreview(item.char);
               }}
               onFocus={() => {
-                setPreview(item.char);
+                if (open) setPreview(item.char);
               }}
               onClick={() => {
                 change?.(offset, item.char);
@@ -156,7 +167,7 @@ export function TaskItem({ state, offset, children }: Props) {
           ))}
         </Menu.Dropdown>
       </Menu>
-      <div className={classes.content}>{children}</div>
+      <div className={task.content}>{children}</div>
     </li>
   );
 }

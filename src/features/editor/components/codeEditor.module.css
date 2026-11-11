@@ -1,0 +1,12 @@
+/* The frame of an editor that is not inside a tile (see CodeEditor). */
+.frame {
+  color: var(--color-text-muted);
+  background: var(--color-bg-deep);
+  border: 1px solid color-mix(in oklab, var(--color-border) 35%, transparent);
+  border-radius: 8px;
+}
+
+.frame:focus-within {
+  outline: 2px solid var(--color-primary-hover);
+  outline-offset: 1px;
+}

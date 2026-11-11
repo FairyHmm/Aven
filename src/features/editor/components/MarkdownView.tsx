@@ -13,7 +13,8 @@ import { asTaskState, remarkTasks, type TaskState } from "../lib/tasks";
 import { MermaidBlock } from "./MermaidBlock";
 import { TaskContext, TaskItem } from "./TaskItem";
 
-import classes from "./markdown.module.css";
+import calloutClasses from "./callouts.module.css";
+import markdownClasses from "./markdown.module.css";
 
 type PreProps = ExtraProps;
 
@@ -83,12 +84,12 @@ const rehypePlugins: NonNullable<Options["rehypePlugins"]> = [
     {
       theme: "obsidian",
       props: {
-        containerProps: { className: [classes.callout] },
-        titleProps: { className: [classes.calloutTitle] },
-        titleIconProps: { className: [classes.calloutIcon] },
-        titleTextProps: { className: [classes.calloutText] },
-        foldIconProps: { className: [classes.calloutFold] },
-        contentProps: { className: [classes.calloutContent] },
+        containerProps: { className: [calloutClasses.callout] },
+        titleProps: { className: [calloutClasses.calloutTitle] },
+        titleIconProps: { className: [calloutClasses.calloutIcon] },
+        titleTextProps: { className: [calloutClasses.calloutText] },
+        foldIconProps: { className: [calloutClasses.calloutFold] },
+        contentProps: { className: [calloutClasses.calloutContent] },
       },
     },
   ],
@@ -117,7 +118,7 @@ export function MarkdownView({ body, onBodyChange }: Props) {
   );
   return (
     <TaskContext value={onBodyChange === undefined ? undefined : setTask}>
-      <div className={classes.markdown}>
+      <div className={markdownClasses.markdown}>
         <Markdown
           remarkPlugins={plugins}
           rehypePlugins={rehypePlugins}

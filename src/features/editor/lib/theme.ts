@@ -1,4 +1,5 @@
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
+import { Prec } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { tags } from "@lezer/highlight";
 
@@ -6,25 +7,22 @@ import { tags } from "@lezer/highlight";
 // the palette without a separate colour scheme.
 const frame = EditorView.theme(
   {
-    "&": {
-      color: "var(--color-text-muted)",
-      backgroundColor: "var(--color-bg-deep)",
-      border:
-        "1px solid color-mix(in oklab, var(--color-border) 35%, transparent)",
-      borderRadius: "8px",
-    },
-    "&.cm-focused": {
-      outline: "2px solid var(--color-primary-hover)",
-      outlineOffset: "1px",
-    },
+    "&": { color: "var(--color-text-muted)" },
+    "&.cm-focused": { outline: "none" },
     ".cm-scroller": {
       fontFamily: "var(--mantine-font-family)",
       lineHeight: "1.65",
       maxHeight: "52vh",
-      minHeight: "11rem",
       overflow: "auto",
     },
-    ".cm-content": { padding: "12px 14px", caretColor: "var(--color-text)" },
+    // The minimum height belongs to the content, not the scroller: the empty
+    // part under the last line is then the text's own, and a click there puts
+    // the cursor at the end.
+    ".cm-content": {
+      padding: "12px 14px",
+      minHeight: "11rem",
+      caretColor: "var(--color-text)",
+    },
     ".cm-line": { padding: "0" },
     ".cm-cursor": { borderLeftColor: "var(--color-text)" },
     "&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground, .cm-selectionBackground":
@@ -62,3 +60,16 @@ const highlight = HighlightStyle.define([
 ]);
 
 export const editorTheme = [frame, syntaxHighlighting(highlight)];
+
+// The editor sitting inside a card tile: no frame of its own, the tile is the
+// frame, and it only takes the room its text needs.
+export const compactTheme = Prec.high(
+  EditorView.theme(
+    {
+      "&": { fontSize: "0.8rem" },
+      ".cm-scroller": { maxHeight: "18rem" },
+      ".cm-content": { padding: "0", minHeight: "0" },
+    },
+    { dark: true },
+  ),
+);
