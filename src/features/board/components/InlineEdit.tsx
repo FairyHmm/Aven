@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import classes from "./column.module.css";
+import classes from "./column/column.module.css";
 
 type Props = {
   value: string;

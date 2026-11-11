@@ -1,9 +1,9 @@
 import { ActionIcon, Menu } from "@mantine/core";
 import { Ellipsis, Pencil, Trash2 } from "lucide-react";
 
-import { ACCENTS, type Accent } from "../lib/types";
+import { ACCENTS, type Accent } from "../../lib/types";
 
-import classes from "./column.module.css";
+import classes from "./columnMenu.module.css";
 
 type Props = {
   accent: Accent;

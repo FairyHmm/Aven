@@ -9,7 +9,8 @@ import {
   type ReactNode,
 } from "react";
 
-const DURATION = 260;
+import { ms } from "../../../shared/lib/motion";
+
 const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
 
 // Cross-fades between boards. The outgoing board is snapshotted into
@@ -82,9 +83,12 @@ export function CrossFade({ children }: { children: ReactNode }) {
   }, [entering]);
 
   // Drop the overlay once its fade completes.
-  const { start: startLeave, clear: clearLeave } = useTimeout(() => {
-    setLeaving(null);
-  }, DURATION + 60);
+  const { start: startLeave, clear: clearLeave } = useTimeout(
+    () => {
+      setLeaving(null);
+    },
+    ms("base") + 60,
+  );
   useEffect(() => {
     if (leaving !== null) {
       startLeave();
@@ -97,7 +101,7 @@ export function CrossFade({ children }: { children: ReactNode }) {
     position: "relative",
     opacity: entering ? 0 : 1,
     transform: entering ? "scale(1.03)" : "scale(1)",
-    transition: `opacity ${DURATION}ms ${EASE}, transform ${DURATION}ms ${EASE}`,
+    transition: `opacity ${ms("base")}ms ${EASE}, transform ${ms("base")}ms ${EASE}`,
   };
 
   return (
@@ -115,7 +119,7 @@ export function CrossFade({ children }: { children: ReactNode }) {
             pointerEvents: "none",
             opacity: 1,
             transform: "scale(1)",
-            transition: `opacity ${DURATION}ms ${EASE}, transform ${DURATION}ms ${EASE}`,
+            transition: `opacity ${ms("base")}ms ${EASE}, transform ${ms("base")}ms ${EASE}`,
           }}
         />
       )}

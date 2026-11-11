@@ -40,7 +40,12 @@
 
 .card:active {
   transform: translateY(0) scale(0.99);
-  transition-duration: 60ms;
+  transition-duration: var(--dur-fast);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--color-primary-hover);
+  outline-offset: 1px;
 }
 
 /* Pressing a control inside the card must not shift it from under the pointer. */
@@ -48,9 +53,56 @@
   transform: translateY(-1px);
 }
 
-.card:focus-visible {
-  outline: 2px solid var(--color-primary-hover);
-  outline-offset: 1px;
+/* Being edited in place: the tile stays put and the text owns the pointer. */
+.card[data-editing],
+.card[data-editing]:hover,
+.card[data-editing]:active {
+  transform: none;
+  cursor: text;
+  border-color: var(--color-primary-hover);
+}
+
+/* Everything the tile shows, in one box: its height drives growth. */
+.inner {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Keeps the editor's pieces laid out as the tile's own children. */
+.editorBox {
+  display: contents;
+}
+
+/* Quick edit: shown while the pointer or focus is on the tile. */
+.quickEdit {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  color: var(--color-ac);
+  cursor: pointer;
+  background: color-mix(in oklab, var(--color-bg-card) 85%, transparent);
+  border: none;
+  border-radius: 6px;
+  opacity: 0;
+  transition:
+    opacity var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+
+.quickEdit:hover,
+.quickEdit:focus-visible {
+  color: var(--color-text);
+}
+
+.card:hover .quickEdit,
+.card:focus-within .quickEdit {
+  opacity: 1;
 }
 
 .title {
@@ -61,8 +113,7 @@
   overflow-wrap: anywhere;
 }
 
-/* The card's markdown, read-only and clamped; a click opens the editor, so
-   links inside are inert here. */
+/* The card's markdown, read-only and clamped. */
 .body {
   max-height: 11rem;
   overflow: hidden;
@@ -83,22 +134,6 @@
   gap: 6px;
   margin-top: 2px;
   font-size: 0.72rem;
-  color: var(--color-ac);
-}
-
-.preview {
-  font-size: 0.9rem;
-  min-height: 11rem;
-  max-height: 52vh;
-  padding: 12px 14px;
-  overflow: auto;
-  background: var(--color-bg-deep);
-  border: 1px solid color-mix(in oklab, var(--color-border) 35%, transparent);
-  border-radius: 8px;
-}
-
-.empty {
-  font-size: 0.85rem;
   color: var(--color-ac);
 }
 

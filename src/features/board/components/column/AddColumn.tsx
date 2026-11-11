@@ -2,9 +2,9 @@ import { ActionIcon, Button, TextInput } from "@mantine/core";
 import { Plus, X } from "lucide-react";
 import { useState } from "react";
 
-import { useBoardActions } from "../hooks/useBoardActions";
+import { useBoardActions } from "../../hooks/useBoardActions";
 
-import classes from "./column.module.css";
+import classes from "./columnComposer.module.css";
 
 // Ghost tile at the end of the lane that turns into a name field.
 export function AddColumn() {

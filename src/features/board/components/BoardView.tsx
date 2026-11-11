@@ -7,10 +7,11 @@ import { useSortableDrop } from "../../../shared/hooks/useSortableDrop";
 import { useSortableList } from "../../../shared/hooks/useSortableList";
 import { useBoard } from "../hooks/useBoard";
 import { useBoardActions } from "../hooks/useBoardActions";
-import { AddColumn } from "./AddColumn";
+import { useQuickEditKey } from "../hooks/useQuickEditKey";
 import { BoardToolbar } from "./BoardToolbar";
-import { CardEditorModal } from "./CardEditorModal";
-import { ColumnView } from "./ColumnView";
+import { CardEditorModal } from "./cardBack/CardEditorModal";
+import { AddColumn } from "./column/AddColumn";
+import { ColumnView } from "./column/ColumnView";
 
 import classes from "./board.module.css";
 
@@ -18,6 +19,7 @@ type Props = { spaceId: string; boardId: string; name: string };
 
 export function BoardView({ spaceId, boardId, name }: Props) {
   const board = useBoard(spaceId, boardId);
+  useQuickEditKey();
   const actions = useBoardActions();
   const stage = useRef<HTMLDivElement>(null);
   const lane = useRef<HTMLDivElement>(null);

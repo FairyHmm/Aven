@@ -1,15 +1,15 @@
 import { useRef, useState } from "react";
 
-import { SortableItem } from "../../../shared/components/SortableItem";
-import { useAutoScroll } from "../../../shared/hooks/useAutoScroll";
-import { useSortableList } from "../../../shared/hooks/useSortableList";
-import { useBoardActions } from "../hooks/useBoardActions";
-import { useColumnCards } from "../hooks/useColumnCards";
-import type { Column } from "../lib/types";
-import { CardComposer } from "./CardComposer";
-import { CardTile } from "./CardTile";
+import { SortableItem } from "../../../../shared/components/SortableItem";
+import { useAutoScroll } from "../../../../shared/hooks/useAutoScroll";
+import { useSortableList } from "../../../../shared/hooks/useSortableList";
+import { useBoardActions } from "../../hooks/useBoardActions";
+import { useColumnCards } from "../../hooks/useColumnCards";
+import type { Column } from "../../lib/types";
+import { CardComposer } from "../card/CardComposer";
+import { CardSlot } from "../card/CardSlot";
+import { InlineEdit } from "../InlineEdit";
 import { ColumnMenu } from "./ColumnMenu";
-import { InlineEdit } from "./InlineEdit";
 
 import classes from "./column.module.css";
 
@@ -93,17 +93,13 @@ export function ColumnView({ column, index, count }: Props) {
 
         <div ref={list} className={classes.list}>
           {cards.map((card, position) => (
-            <SortableItem
+            <CardSlot
               key={card.id}
-              kind="card"
-              id={card.id}
-              listId={column.id}
-              axis="vertical"
+              card={card}
+              columnId={column.id}
               index={position}
               count={cards.length}
-            >
-              <CardTile card={card} />
-            </SortableItem>
+            />
           ))}
           {(cards.length === 0 || emptySize > 0) && (
             <div

@@ -1,0 +1,145 @@
+/* The menu and the dim behind it are one thing, so that they leave together
+   (see hooks/useLeaveGhost.ts). */
+.host {
+  display: contents;
+}
+
+/* A little dim over everything but the tile being edited: a clear hole the
+   size of the tile (a fixed box with a huge shadow around it, so no scrolling
+   ancestor clips it). It fades in and out, and follows the tile's size
+   as it is, with no transition of its own: it would only trail behind. */
+.scrim {
+  position: fixed;
+  z-index: 200;
+  pointer-events: none;
+  border-radius: 8px;
+  box-shadow: 0 0 0 100vmax
+    color-mix(in oklab, var(--color-bg-deep) 46%, transparent);
+  animation: appear var(--dur) var(--ease) backwards;
+}
+
+.menu {
+  position: fixed;
+  z-index: 250;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  /* Where the actions come from: the tile. */
+  --slide: -18px;
+  --origin: left center;
+}
+
+.menu[data-side="left"] {
+  --slide: 18px;
+  --origin: right center;
+}
+
+/* The buttons of the menu's current view (see ViewFade). */
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* The actions come out of the tile one after another, each on a spring that
+   overshoots a little (Material 3 Expressive); opacity only fades, quickly.
+   Every view of the menu plays it again, as its buttons are new. */
+.view > * {
+  transform-origin: var(--origin);
+  animation:
+    rise var(--dur-spatial) var(--spring) backwards,
+    appear var(--dur-fast) linear backwards;
+  animation-delay: calc(var(--i, 0) * 34ms);
+}
+
+.view > :nth-child(2) {
+  --i: 1;
+}
+
+.view > :nth-child(3) {
+  --i: 2;
+}
+
+.view > :nth-child(4) {
+  --i: 3;
+}
+
+.view > :nth-child(5) {
+  --i: 4;
+}
+
+.view > :nth-child(6) {
+  --i: 5;
+}
+
+.view > :nth-child(7) {
+  --i: 6;
+}
+
+.view > :nth-child(8) {
+  --i: 7;
+}
+
+.view > :nth-child(9) {
+  --i: 8;
+}
+
+.view > :nth-child(10) {
+  --i: 9;
+}
+
+.view > :nth-child(11) {
+  --i: 10;
+}
+
+.view > :nth-child(12) {
+  --i: 11;
+}
+
+@keyframes rise {
+  from {
+    transform: translateX(var(--slide)) scale(0.8);
+  }
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Leaving: the copy left behind when the menu is removed. The buttons go
+   back into the tile, quicker than they came, the last one first. */
+.host[data-leaving] {
+  pointer-events: none;
+}
+
+.host[data-leaving] .scrim {
+  animation: vanish var(--dur) var(--ease) forwards;
+}
+
+.host[data-leaving] .view > * {
+  animation: leave var(--dur) cubic-bezier(0.3, 0, 0.8, 0.15) forwards;
+  animation-delay: max(0ms, calc((6 - var(--i, 0)) * 14ms));
+}
+
+@keyframes vanish {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes leave {
+  to {
+    opacity: 0;
+    transform: translateX(var(--slide)) scale(0.8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .view > *,
+  .scrim {
+    animation: none;
+  }
+}

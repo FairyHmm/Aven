@@ -46,11 +46,26 @@
   background: var(--color-bg-card);
   border-radius: 10px;
   opacity: 0.5;
-  animation: appear 200ms 250ms both;
+  animation: appear var(--dur) 250ms both;
 }
 
 @keyframes appear {
   from {
     opacity: 0;
   }
+}
+
+/* The tag the board is narrowed to; click to show everything again. */
+.filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  font: inherit;
+  font-size: 0.75rem;
+  color: var(--label-ink);
+  cursor: pointer;
+  background: var(--label);
+  border: none;
+  border-radius: 999px;
 }

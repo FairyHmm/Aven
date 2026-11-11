@@ -1,0 +1,31 @@
+/* Colour swatches inside the column menu. */
+.swatches {
+  display: flex;
+  gap: 8px;
+  padding: 6px 12px;
+}
+
+.swatch {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  cursor: pointer;
+  background: var(--accent);
+  border: 2px solid transparent;
+  border-radius: 50%;
+  transition: transform var(--dur-fast) var(--ease);
+}
+
+.swatch:hover {
+  transform: scale(1.15);
+}
+
+.swatch[data-active="true"] {
+  border-color: var(--color-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swatch {
+    transition: none;
+  }
+}
