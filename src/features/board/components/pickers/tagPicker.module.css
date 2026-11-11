@@ -1,0 +1,175 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 16rem;
+  overflow-y: auto;
+}
+
+.labelRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Label bar with colour and name. */
+.bar {
+  flex: 1;
+  min-width: 0;
+  min-height: 32px;
+  padding: 0 10px;
+  overflow: hidden;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--label-ink);
+  text-align: start;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  background: var(--label);
+  border: none;
+  border-radius: 4px;
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+  transition:
+    filter var(--dur-fast) var(--ease),
+    outline-color var(--dur) var(--ease);
+}
+
+.bar[data-chosen] {
+  outline-color: var(--color-text);
+}
+
+/* The tick grows in when the list becomes multi-select. */
+.tick {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 0;
+  margin-right: -8px;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    width var(--dur) var(--ease),
+    margin var(--dur) var(--ease),
+    opacity var(--dur) var(--ease);
+}
+
+.tick[data-on] {
+  width: 18px;
+  margin-right: 0;
+  opacity: 1;
+}
+
+.bar:hover,
+.bar:focus-visible {
+  filter: brightness(1.12);
+}
+
+.pencil {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  color: var(--color-ac);
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+
+/* The grip an option is dragged by. */
+.grip {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 28px;
+  margin-right: -4px;
+  color: var(--color-ac);
+  cursor: grab;
+  touch-action: none;
+}
+
+.pencil,
+.grip {
+  opacity: 0;
+}
+
+.pencil:hover,
+.pencil:focus-visible {
+  color: var(--color-text);
+  background: var(--color-bg-hover);
+}
+
+.labelRow:hover .pencil,
+.labelRow:hover .grip,
+.labelRow:focus-within .pencil,
+.labelRow:focus-within .grip {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .pencil,
+  .grip {
+    opacity: 1;
+  }
+}
+
+.pencil[data-sure] {
+  width: auto;
+  padding: 0 8px;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-red, #ff6b6b);
+}
+
+/* A name typed that is not one yet: made with a click or Enter. */
+.create {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 10px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+  cursor: pointer;
+  background: none;
+  border: 1px dashed var(--mantine-color-default-border);
+  border-radius: 4px;
+}
+
+.create:hover,
+.create:focus-visible {
+  background: var(--color-bg-hover);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+
+.swatch {
+  display: grid;
+  place-items: center;
+  height: 32px;
+  padding: 0;
+  color: var(--label-ink);
+  cursor: pointer;
+  background: var(--label);
+  border: none;
+  border-radius: 4px;
+}
+
+.swatch:hover,
+.swatch:focus-visible {
+  filter: brightness(1.12);
+}

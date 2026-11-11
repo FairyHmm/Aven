@@ -1,0 +1,102 @@
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Title centred, close on the right, back on the left. */
+.header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+}
+
+.heading {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-ac);
+}
+
+.back {
+  position: absolute;
+  inset-inline-start: 0;
+}
+
+.close {
+  position: absolute;
+  inset-inline-end: 0;
+}
+
+.heading2 {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-ac);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dueRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 7rem;
+  gap: 6px;
+}
+
+.preview {
+  display: flex;
+  align-items: center;
+  min-width: 50%;
+  min-height: 32px;
+  padding: 0 10px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--label-ink);
+  background: var(--label);
+  border: none;
+  border-radius: 4px;
+}
+
+/* Preview strip background. */
+.previewBox {
+  display: grid;
+  place-items: center;
+  padding: 18px 12px;
+  background: var(--color-bg-deep);
+  border-radius: 6px;
+}
+
+.note {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-ac);
+}
+
+.count {
+  float: inline-end;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+/* A dropdown's settings, under its options. */
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--mantine-color-default-border);
+}

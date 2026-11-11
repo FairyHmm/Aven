@@ -1,0 +1,155 @@
+/* A tonal button: a tint of the brand colour over the dark surface, a round
+   shape that tightens while the pointer is on it and again while pressed,
+   and a state layer, as in Material You. */
+.action {
+  --r: 18px;
+  --r-hover: 12px;
+  --r-press: 8px;
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text);
+  text-align: start;
+  cursor: pointer;
+  background: color-mix(
+    in oklab,
+    var(--color-primary-muted) 34%,
+    var(--color-bg-deep)
+  );
+  border: none;
+  border-radius: var(--r);
+  backdrop-filter: blur(6px);
+  transition:
+    border-radius var(--dur-spatial) var(--spring),
+    transform var(--dur-spatial) var(--spring),
+    background var(--dur-fast) var(--ease);
+}
+
+/* The small size, in a row of buttons. */
+.action[data-compact] {
+  --r: 14px;
+  --r-hover: 10px;
+  --r-press: 7px;
+
+  gap: 6px;
+  width: auto;
+  padding: 5px 12px;
+  font-size: 0.8rem;
+}
+
+.action > svg {
+  flex: none;
+  color: var(--color-primary-hover);
+}
+
+.action::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background: var(--color-text);
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity var(--dur-fast) linear;
+}
+
+.action:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.action:focus-visible {
+  border-radius: var(--r-hover);
+  outline: 2px solid var(--color-primary-hover);
+  outline-offset: 2px;
+}
+
+.action:focus-visible::after {
+  opacity: 0.08;
+}
+
+.action:hover:not(:disabled) {
+  border-radius: var(--r-hover);
+}
+
+.action:hover:not(:disabled)::after {
+  opacity: 0.08;
+}
+
+.action:active:not(:disabled) {
+  border-radius: var(--r-press);
+  transform: scale(0.97);
+}
+
+.action:active:not(:disabled)::after {
+  opacity: 0.14;
+}
+
+/* The main action: the brand colour itself. */
+.action[data-filled] {
+  font-weight: 600;
+  color: #fff;
+  background: var(--color-primary);
+}
+
+/* The error container: the same, in the danger colour. */
+.action[data-danger] {
+  color: var(--color-danger);
+  background: color-mix(
+    in oklab,
+    var(--color-danger-bg) 24%,
+    var(--color-bg-deep)
+  );
+}
+
+.action[data-danger] > svg {
+  color: inherit;
+}
+
+.label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.action[data-compact] .label {
+  flex: none;
+}
+
+.hint {
+  padding: 0 5px;
+  font: inherit;
+  font-size: 0.7rem;
+  color: var(--color-ac);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+
+  /* Shown only for the button under the pointer or focus; it keeps its
+     space so the menu doesn't change width when it appears. */
+  opacity: 0;
+  transition: opacity var(--dur-fast) linear;
+}
+
+.action:focus-visible .hint,
+.action:hover:not(:disabled) .hint {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .action {
+    transition: background var(--dur-fast) var(--ease);
+  }
+
+  .action:active:not(:disabled) {
+    transform: none;
+  }
+}
