@@ -2,6 +2,7 @@ import { insertionIndex } from "../../../shared/lib/dnd/reorder";
 import { newId } from "./id";
 import { byOrder, keyAtIndex } from "./order";
 import { patchOf } from "./patch";
+import { splitCard } from "./text";
 import {
   ACCENTS,
   type Accent,
@@ -9,6 +10,7 @@ import {
   type BoardPatch,
   type Card,
   type Column,
+  type Props,
 } from "./types";
 
 // Pure mutations: each takes the current board and returns the patch that
@@ -78,15 +80,16 @@ export function removeColumn(data: BoardData, id: string): BoardPatch {
   });
 }
 
-// First line becomes the title, anything after it the markdown body.
+// First line becomes the title, anything after it the markdown body; the
+// properties start empty and are set with the property controls.
 export function addCard(
   data: BoardData,
   columnId: string,
   text: string,
   now = Date.now(),
 ): BoardPatch {
-  const [first = "", ...rest] = text.trim().split("\n");
-  if (first.trim() === "") {
+  const { title, body } = splitCard(text.trim());
+  if (title === "") {
     return patchOf();
   }
   const siblings = cardsOf(data, columnId);
@@ -95,8 +98,9 @@ export function addCard(
       {
         id: newId(),
         columnId,
-        title: first.trim(),
-        body: rest.join("\n").trim(),
+        title,
+        props: {},
+        body,
         order: keyAtIndex(siblings, siblings.length),
         createdAt: now,
         updatedAt: now,
@@ -108,7 +112,7 @@ export function addCard(
 export function editCard(
   data: BoardData,
   id: string,
-  changes: { title: string; body: string },
+  changes: { title: string; body: string; props?: Props | undefined },
   now = Date.now(),
 ): BoardPatch {
   const card = data.cards.find(item => item.id === id);
@@ -121,6 +125,8 @@ export function editCard(
       {
         ...card,
         title: title === "" ? "Untitled" : title,
+        // Callers that only touch the text (a ticked task) leave them be.
+        props: changes.props ?? card.props,
         body: changes.body,
         updatedAt: now,
       },

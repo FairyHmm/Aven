@@ -19,11 +19,29 @@ export type Column = {
   order: string;
 };
 
+// One property value: text, number, checkbox, date / date & time (as an ISO
+// string) or a list of strings. See lib/props.ts.
+// The popups of the built-in properties (labels, dates, members).
+export type PropertyPopup = "labels" | "dates" | "members";
+
+// A new field is being named, and of what kind: a plain custom field (its
+// type follows the first value) or a dropdown (made straight away).
+export type NewFieldKind = "field" | "dropdown";
+
+// What the card back has open: a built-in property popup, or a new field
+// being named (either kind).
+export type PopupKind = PropertyPopup | NewFieldKind;
+
+export type PropValue = string | number | boolean | string[];
+export type Props = Record<string, PropValue>;
+
 export type Card = {
   id: string;
   columnId: string;
   title: string;
-  // Markdown document. The tile shows a plain-text snippet of it.
+  // The YAML frontmatter shown right under the title (labels, dates, ...).
+  props: Props;
+  // Markdown document, without the frontmatter.
   body: string;
   order: string;
   createdAt: number;

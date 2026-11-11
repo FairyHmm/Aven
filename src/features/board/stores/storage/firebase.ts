@@ -1,5 +1,6 @@
 import type { DocumentData, WriteBatch } from "firebase/firestore";
 
+import { toProps } from "../../lib/props/props";
 import type { BoardRef, Card, Column } from "../../lib/types";
 import { isAccent } from "../../lib/types";
 import type { BoardStorage } from "./types";
@@ -42,6 +43,7 @@ function toCard(id: string, data: DocumentData): Card {
     id,
     columnId: text(data.columnId, ""),
     title: text(data.title, "Untitled"),
+    props: toProps(data.props),
     body: text(data.body, ""),
     order: text(data.order, "a0"),
     createdAt: num(data.createdAt, 0),

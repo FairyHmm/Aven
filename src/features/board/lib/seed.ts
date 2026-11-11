@@ -22,10 +22,12 @@ export function seedBoard(now = Date.now()): BoardData {
     index: number,
     title: string,
     body: string,
+    props: Card["props"] = {},
   ): Card => ({
     id: newId(),
     columnId: column.id,
     title,
+    props,
     body,
     order: cardKeys[index],
     createdAt: now,
@@ -46,6 +48,12 @@ export function seedBoard(now = Date.now()): BoardData {
         1,
         "Sketch the sharing model",
         "Link sharing on a whole space, with view / comment / edit roles.",
+        {
+          tags: ["green", "design", "sharing"],
+          start: "2026-11-10",
+          due: "2026-11-14T17:00",
+          reminder: "1 day before",
+        },
       ),
       card(todo, 2, "Write the IT3120 report", ""),
       card(
@@ -53,6 +61,7 @@ export function seedBoard(now = Date.now()): BoardData {
         0,
         "Kanban board surface",
         "Columns, cards, drag and drop, local or Firebase storage.",
+        { tags: ["blue", "frontend/board"] },
       ),
       card(
         doing,

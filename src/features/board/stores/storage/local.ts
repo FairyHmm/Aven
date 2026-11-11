@@ -1,4 +1,5 @@
 import { applyPatch } from "../../lib/patch";
+import { toProps } from "../../lib/props/props";
 import type { BoardData, BoardRef } from "../../lib/types";
 import type { BoardStorage } from "./types";
 
@@ -16,13 +17,24 @@ function isBoardData(value: unknown): value is BoardData {
   );
 }
 
+// Boards saved before cards had properties.
+function withProps(data: BoardData): BoardData {
+  return {
+    ...data,
+    cards: data.cards.map(card => {
+      const props: unknown = card.props;
+      return { ...card, props: toProps(props) };
+    }),
+  };
+}
+
 function read(ref: BoardRef): BoardData | undefined {
   const raw = localStorage.getItem(keyOf(ref));
   if (raw === null) {
     return undefined;
   }
   const parsed: unknown = JSON.parse(raw);
-  return isBoardData(parsed) ? parsed : undefined;
+  return isBoardData(parsed) ? withProps(parsed) : undefined;
 }
 
 export const localBoardStorage: BoardStorage = {

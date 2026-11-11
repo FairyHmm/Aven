@@ -1,10 +1,20 @@
 import { create } from "zustand";
 
 import { captureLayout, markLoaded } from "../../../shared/lib/dnd/flip";
+import { ghostOut } from "../../../shared/lib/dnd/glide";
+import { duplicateCard } from "../lib/duplicate";
+import { renameTag } from "../lib/labels/renameTag";
 import * as ops from "../lib/mutations";
 import { applyPatch, fullPatch, isEmptyPatch } from "../lib/patch";
+import { rewriteValues } from "../lib/props/dropdowns";
 import { seedBoard } from "../lib/seed";
-import type { Accent, BoardData, BoardPatch, BoardRef } from "../lib/types";
+import type {
+  Accent,
+  BoardData,
+  BoardPatch,
+  BoardRef,
+  Props,
+} from "../lib/types";
 import { storage } from "./storage";
 
 export type BoardActions = {
@@ -15,8 +25,16 @@ export type BoardActions = {
   recolorColumn: (id: string, accent: Accent) => void;
   removeColumn: (id: string) => void;
   addCard: (columnId: string, text: string) => void;
-  editCard: (id: string, changes: { title: string; body: string }) => void;
+  editCard: (
+    id: string,
+    changes: { title: string; body: string; props?: Props | undefined },
+  ) => void;
   removeCard: (id: string) => void;
+  duplicateCard: (id: string) => void;
+  renameTag: (from: string, to: string) => void;
+  // Dropdown options renamed or removed ("" as `to`): the cards holding
+  // `from` in one of `fields` follow.
+  rewriteValues: (fields: string[], from: string, to: string) => void;
   moveCard: (id: string, toColumnId: string, index: number) => void;
   moveColumn: (id: string, index: number) => void;
 };
@@ -102,6 +120,7 @@ export const useBoardStore = create<BoardState>()((set, get) => {
       commit(data => ops.recolorColumn(data, id, accent));
     },
     removeColumn: id => {
+      ghostOut(`column:${id}`);
       commit(data => ops.removeColumn(data, id));
     },
     addCard: (columnId, text) => {
@@ -111,7 +130,17 @@ export const useBoardStore = create<BoardState>()((set, get) => {
       commit(data => ops.editCard(data, id, changes));
     },
     removeCard: id => {
+      ghostOut(`card:${id}`);
       commit(() => ops.removeCard(id));
+    },
+    duplicateCard: id => {
+      commit(data => duplicateCard(data, id));
+    },
+    renameTag: (from, to) => {
+      commit(data => renameTag(data, from, to));
+    },
+    rewriteValues: (fields, from, to) => {
+      commit(data => rewriteValues(data, fields, from, to));
     },
     moveCard: (id, toColumnId, index) => {
       commit(data => ops.moveCard(data, id, toColumnId, index));

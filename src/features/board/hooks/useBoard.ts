@@ -3,6 +3,9 @@ import { useEffect, useMemo } from "react";
 import { sortedColumns } from "../lib/mutations";
 import { useBoardStore } from "../stores/boardStore";
 import { useEditorStore } from "../stores/editorStore";
+import { useFieldStore } from "../stores/fieldStore";
+import { useFilterStore } from "../stores/filterStore";
+import { useTagStore } from "../stores/tagStore";
 
 // Loads the board for the route and returns what the surface itself shows:
 // the columns in order, a card count and the load/save status. Anything
@@ -10,9 +13,12 @@ import { useEditorStore } from "../stores/editorStore";
 // used, through the other hooks here, instead of being passed down.
 export function useBoard(spaceId: string, boardId: string) {
   useEffect(() => {
+    useTagStore.getState().load(spaceId);
+    useFieldStore.getState().load(spaceId);
     void useBoardStore.getState().actions.load({ spaceId, boardId });
     return () => {
       useEditorStore.getState().close();
+      useFilterStore.getState().clear();
     };
   }, [spaceId, boardId]);
 
