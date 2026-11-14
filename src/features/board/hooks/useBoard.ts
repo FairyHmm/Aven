@@ -1,5 +1,7 @@
 import { useEffect, useMemo } from "react";
 
+import { STORAGE_MODE } from "../../../shared/lib/storageMode";
+import { useSpace } from "../../space/hooks/useSpaces";
 import { sortedColumns } from "../lib/mutations";
 import { useBoardStore } from "../stores/boardStore";
 import { useEditorStore } from "../stores/editorStore";
@@ -8,15 +10,25 @@ import { useFilterStore } from "../stores/filterStore";
 import { useTagStore } from "../stores/tagStore";
 
 // Loads the board for the route and returns what the surface itself shows:
-// the columns in order, a card count and the load/save status. Anything
-// deeper (a column's cards, the actions, the open editor) is read where it is
-// used, through the other hooks here, instead of being passed down.
+// the columns in order, a card count and the load/save status.
 export function useBoard(spaceId: string, boardId: string) {
+  const { space } = useSpace(spaceId);
+  const tagColors = space?.tagColors;
+  const fieldConfig = space?.fieldConfig;
+
+  useEffect(() => {
+    if (STORAGE_MODE === "firebase" && space !== undefined) {
+      useTagStore.getState().hydrate(spaceId, tagColors);
+      useFieldStore.getState().hydrate(spaceId, fieldConfig);
+    }
+  }, [spaceId, space, tagColors, fieldConfig]);
+
   useEffect(() => {
     useTagStore.getState().load(spaceId);
     useFieldStore.getState().load(spaceId);
-    void useBoardStore.getState().actions.load({ spaceId, boardId });
+    useBoardStore.getState().actions.load({ spaceId, boardId });
     return () => {
+      useBoardStore.getState().actions.unload();
       useEditorStore.getState().close();
       useFilterStore.getState().clear();
     };

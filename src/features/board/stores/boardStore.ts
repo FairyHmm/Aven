@@ -1,24 +1,27 @@
 import { create } from "zustand";
 
-import { captureLayout, markLoaded } from "../../../shared/lib/dnd/flip";
+import { captureLayout } from "../../../shared/lib/dnd/flip";
 import { ghostOut } from "../../../shared/lib/dnd/glide";
+import { addAttachment, removeAttachment } from "../lib/attachments";
 import { duplicateCard } from "../lib/duplicate";
 import { renameTag } from "../lib/labels/renameTag";
 import * as ops from "../lib/mutations";
-import { applyPatch, fullPatch, isEmptyPatch } from "../lib/patch";
+import { applyPatch, isEmptyPatch } from "../lib/patch";
 import { rewriteValues } from "../lib/props/dropdowns";
-import { seedBoard } from "../lib/seed";
 import type {
   Accent,
+  Attachment,
   BoardData,
   BoardPatch,
   BoardRef,
   Props,
 } from "../lib/types";
+import { describeBoardError, subscribeBoard } from "./boardSync";
 import { storage } from "./storage";
 
 export type BoardActions = {
-  load: (ref: BoardRef) => Promise<void>;
+  load: (ref: BoardRef) => void;
+  unload: () => void;
   dismissError: () => void;
   addColumn: (name: string) => void;
   renameColumn: (id: string, name: string) => void;
@@ -31,9 +34,9 @@ export type BoardActions = {
   ) => void;
   removeCard: (id: string) => void;
   duplicateCard: (id: string) => void;
+  addAttachment: (cardId: string, attachment: Attachment) => void;
+  removeAttachment: (cardId: string, attachmentId: string) => void;
   renameTag: (from: string, to: string) => void;
-  // Dropdown options renamed or removed ("" as `to`): the cards holding
-  // `from` in one of `fields` follow.
   rewriteValues: (fields: string[], from: string, to: string) => void;
   moveCard: (id: string, toColumnId: string, index: number) => void;
   moveColumn: (id: string, index: number) => void;
@@ -42,20 +45,14 @@ export type BoardActions = {
 type BoardState = BoardData & {
   ref: BoardRef | undefined;
   status: "loading" | "ready";
-  pending: number; // writes in flight
+  pending: number;
   error: string | undefined;
   actions: BoardActions;
 };
 
-let loadToken = 0; // discards results of superseded loads
-let writeQueue: Promise<void> = Promise.resolve(); // keeps writes in order
-
-function describe(error: unknown): string {
-  const message = error instanceof Error ? error.message : String(error);
-  return /permission|insufficient/i.test(message)
-    ? "Firebase refused the request: the committed Firestore rules deny all access and sign-in isn't wired up yet."
-    : message;
-}
+let loadToken = 0;
+let stopSubscription: (() => void) | undefined;
+let writeQueue: Promise<void> = Promise.resolve();
 
 export const useBoardStore = create<BoardState>()((set, get) => {
   const persist = (ref: BoardRef, patch: BoardPatch) => {
@@ -63,50 +60,44 @@ export const useBoardStore = create<BoardState>()((set, get) => {
     writeQueue = writeQueue
       .then(() => storage.apply(ref, patch))
       .catch((error: unknown) => {
-        set({ error: `Not saved. ${describe(error)}` });
+        set({ error: `Not saved. ${describeBoardError(error)}` });
       })
       .finally(() => {
         set(state => ({ pending: state.pending - 1 }));
       });
   };
 
-  // Every mutation: update memory immediately, then write behind.
   const commit = (build: (data: BoardData) => BoardPatch) => {
     const { ref, columns, cards } = get();
     const patch = build({ columns, cards });
     if (ref === undefined || isEmptyPatch(patch)) {
       return;
     }
-    captureLayout(); // for the FLIP glide, see shared/lib/dnd/flip.ts
+    captureLayout();
     set(applyPatch({ columns, cards }, patch));
     persist(ref, patch);
   };
 
   const actions: BoardActions = {
-    load: async ref => {
+    load: ref => {
       loadToken += 1;
       const token = loadToken;
+      stopSubscription?.();
       set({ ref, status: "loading", columns: [], cards: [], error: undefined });
-      try {
-        const stored = await storage.load(ref);
-        if (token !== loadToken) {
-          return;
-        }
-        const data = stored ?? seedBoard();
-        if (stored === undefined) {
-          await storage.apply(ref, fullPatch(data));
-        }
-        if (token === loadToken) {
-          markLoaded();
-          set({ ...data, status: "ready" });
-        }
-      } catch (error: unknown) {
-        if (token === loadToken) {
-          set({ status: "ready", error: describe(error) });
-        }
-      }
+      stopSubscription = subscribeBoard(
+        ref,
+        () => token === loadToken,
+        patch => {
+          set(patch);
+        },
+        persist,
+      );
     },
-
+    unload: () => {
+      loadToken += 1;
+      stopSubscription?.();
+      stopSubscription = undefined;
+    },
     dismissError: () => {
       set({ error: undefined });
     },
@@ -136,6 +127,12 @@ export const useBoardStore = create<BoardState>()((set, get) => {
     duplicateCard: id => {
       commit(data => duplicateCard(data, id));
     },
+    addAttachment: (cardId, attachment) => {
+      commit(data => addAttachment(data, cardId, attachment));
+    },
+    removeAttachment: (cardId, attachmentId) => {
+      commit(data => removeAttachment(data, cardId, attachmentId));
+    },
     renameTag: (from, to) => {
       commit(data => renameTag(data, from, to));
     },
@@ -151,9 +148,9 @@ export const useBoardStore = create<BoardState>()((set, get) => {
   };
 
   return {
+    ref: undefined,
     columns: [],
     cards: [],
-    ref: undefined,
     status: "loading",
     pending: 0,
     error: undefined,

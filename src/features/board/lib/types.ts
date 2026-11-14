@@ -35,6 +35,17 @@ export type PopupKind = PropertyPopup | NewFieldKind;
 export type PropValue = string | number | boolean | string[];
 export type Props = Record<string, PropValue>;
 
+export type Attachment = {
+  id: string;
+  name: string;
+  size: number;
+  contentType: string;
+  url: string;
+  storagePath: string;
+  uploadedBy: string;
+  uploadedAt: number;
+};
+
 export type Card = {
   id: string;
   columnId: string;
@@ -44,6 +55,7 @@ export type Card = {
   // Markdown document, without the frontmatter.
   body: string;
   order: string;
+  attachments?: Attachment[];
   createdAt: number;
   updatedAt: number;
 };

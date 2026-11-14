@@ -1,14 +1,17 @@
 import { Popover, type PopoverProps } from "@mantine/core";
 import type { ReactNode } from "react";
 
-import { tagsOf, withTags } from "../../lib/props/defaults";
+import {
+  membersOf,
+  tagsOf,
+  withMembers,
+  withTags,
+} from "../../lib/props/defaults";
 import type { PropertyPopup, Props } from "../../lib/types";
 import { DatesPicker } from "../pickers/DatesPicker";
 import { LabelsPicker } from "../pickers/LabelsPicker";
+import { MembersPicker } from "../pickers/MembersPicker";
 import { MARK } from "../pickers/popoverFit";
-import { PopupHeader } from "../pickers/PopupHeader";
-
-import classes from "../pickers/pickers.module.css";
 
 type Pop = {
   kind: PropertyPopup;
@@ -21,10 +24,6 @@ type Pop = {
   children: ReactNode;
 };
 
-// One of the property popups (labels, dates, members) opening from
-// whatever is passed as its target: a button on the card back, or an item of
-// the quick-edit menu. It is rendered in a portal, so it is marked: an editor
-// that ends when focus leaves its tile has to know it is still part of it.
 export function PropPopover({
   kind,
   opened,
@@ -60,12 +59,13 @@ export function PropPopover({
           <DatesPicker props={props} onChange={onChange} close={close} />
         )}
         {kind === "members" && (
-          <div className={classes.picker}>
-            <PopupHeader title="Members" onClose={close} />
-            <p className={classes.note}>
-              Members come with accounts and sharing. Nothing to pick yet.
-            </p>
-          </div>
+          <MembersPicker
+            selected={membersOf(props)}
+            close={close}
+            onChange={members => {
+              onChange(withMembers(props, members));
+            }}
+          />
         )}
       </Popover.Dropdown>
     </Popover>

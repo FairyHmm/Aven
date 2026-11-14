@@ -58,6 +58,13 @@ export function tagsOf(props: Props): string[] {
   return Array.isArray(value) ? value : [];
 }
 
+export function membersOf(props: Props): string[] {
+  const value = props[KEYS.members];
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : [];
+}
+
 function without(props: Props, keys: string[]): Props {
   return Object.fromEntries(
     Object.entries(props).filter(([key]) => !keys.includes(key)),
@@ -68,6 +75,11 @@ function without(props: Props, keys: string[]): Props {
 export function withTags(props: Props, tags: string[]): Props {
   const rest = without(props, [KEYS.tags]);
   return tags.length === 0 ? rest : { ...rest, [KEYS.tags]: tags };
+}
+
+export function withMembers(props: Props, members: string[]): Props {
+  const rest = without(props, [KEYS.members]);
+  return members.length === 0 ? rest : { ...rest, [KEYS.members]: members };
 }
 
 // "" means not set.

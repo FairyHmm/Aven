@@ -1,7 +1,9 @@
 import { create } from "zustand";
 
+import { STORAGE_MODE } from "../../../shared/lib/storageMode";
+import { spaceStorage } from "../../space/stores/storage";
 import { type LabelColor } from "../lib/labels/labelColors";
-import { keyOf, read, type Saved } from "./fieldStorage";
+import { keyOf, parseSaved, read, type Saved } from "./fieldStorage";
 
 // Dropdown lists, and which field uses which, are a space-level setting
 // shared by every board in the space, like label colours (see tagStore.ts): a
@@ -10,6 +12,7 @@ import { keyOf, read, type Saved } from "./fieldStorage";
 type FieldState = Saved & {
   spaceId: string | undefined;
   load: (spaceId: string) => void;
+  hydrate: (spaceId: string, raw: unknown) => void;
   // A list with these options; one that exists is left as it is.
   createList: (name: string, options?: string[]) => void;
   // `field` becomes a dropdown on `list`, or a plain field again.
@@ -34,15 +37,20 @@ export const useFieldStore = create<FieldState>()((set, get) => {
   const save = (next: Partial<Saved>) => {
     set(next);
     const { spaceId, lists, links, colors } = get();
-    if (spaceId !== undefined) {
-      try {
-        localStorage.setItem(
-          keyOf(spaceId),
-          JSON.stringify({ lists, links, colors }),
-        );
-      } catch {
-        // Not saved; they still show until the page is reloaded.
-      }
+    if (spaceId === undefined) return;
+    if (STORAGE_MODE === "firebase") {
+      void spaceStorage.saveSettings(spaceId, {
+        fieldConfig: { lists, links, colors },
+      });
+      return;
+    }
+    try {
+      localStorage.setItem(
+        keyOf(spaceId),
+        JSON.stringify({ lists, links, colors }),
+      );
+    } catch {
+      // Not saved; they still show until the page is reloaded.
     }
   };
   const options = (list: string) => get().lists[list] ?? [];
@@ -53,8 +61,16 @@ export const useFieldStore = create<FieldState>()((set, get) => {
     colors: {},
     load: spaceId => {
       if (get().spaceId !== spaceId) {
-        set({ spaceId, ...read(spaceId) });
+        set({
+          spaceId,
+          ...(STORAGE_MODE === "firebase"
+            ? parseSaved(undefined)
+            : read(spaceId)),
+        });
       }
+    },
+    hydrate: (spaceId, raw) => {
+      set({ spaceId, ...parseSaved(raw) });
     },
     createList: (name, initial = []) => {
       if (!(name in get().lists)) {

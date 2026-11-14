@@ -36,3 +36,5 @@ coverage
 *.sln
 *.sw?
 .directory
+
+docs/
