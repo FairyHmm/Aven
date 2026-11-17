@@ -1,0 +1,57 @@
+/* What a cell shows while it is not being edited: its markdown, drawn. It is
+   as big as the cell, which the input is laid over (editor.module.css). */
+.view {
+  max-width: 28em;
+  padding: var(--cell-pad);
+  line-height: var(--cell-line);
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+/* An empty cell keeps a line of its own. */
+.view > div {
+  min-height: calc(var(--cell-line) * 1em);
+  line-height: inherit;
+  color: inherit;
+}
+
+/* Under the markdown wrapper, to win over its margins (markdown). */
+.view > div p {
+  display: inline;
+  margin: 0;
+}
+
+.view > div :where(ul, ol) {
+  display: inline;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.view > div li {
+  display: inline;
+}
+
+/* The text of the input is what the view already shows. Doubled, to win over
+   the input's own colour (editor.module.css). */
+.hidden.hidden {
+  color: transparent;
+}
+
+/* The cells in the corners of the table follow its rounded corners, so the
+   ring of the one with the caret does too. */
+thead tr > .box:first-child > .round {
+  border-top-left-radius: calc(0.5em - 1px);
+}
+
+thead tr > .box:last-child > .round {
+  border-top-right-radius: calc(0.5em - 1px);
+}
+
+tbody tr:last-child > .box:first-child > .round {
+  border-bottom-left-radius: calc(0.5em - 1px);
+}
+
+tbody tr:last-child > .box:last-child > .round {
+  border-bottom-right-radius: calc(0.5em - 1px);
+}

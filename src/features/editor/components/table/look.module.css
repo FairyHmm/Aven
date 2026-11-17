@@ -1,0 +1,59 @@
+/* One look for a table, in the read view and in the editor: a quiet rounded
+   frame, a heavier shaded header, and a grid only as big as its text. The
+   editor sets `--table-pad: 0` on its wrapper, because its cells are inputs
+   that carry the padding themselves. Everything is in em, so a table is the
+   same shape at any text size (a tile's text is smaller than the editor's):
+   `--cell-pad` and `--cell-line` are shared with the editor's inputs. */
+.frame {
+  --cell-pad: 0.25em 0.625em;
+  --cell-line: 1.5;
+
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid color-mix(in oklab, var(--color-border) 45%, transparent);
+  border-radius: 0.5em;
+}
+
+.table {
+  width: max-content;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: var(--table-pad, var(--cell-pad));
+  line-height: var(--cell-line);
+  vertical-align: top;
+  border: 1px solid color-mix(in oklab, var(--color-border) 28%, transparent);
+}
+
+.table th {
+  font-weight: 650;
+  color: var(--color-text);
+  text-align: left;
+  background: color-mix(in oklab, white 5%, transparent);
+}
+
+.table tr > :first-child {
+  border-left: 0;
+}
+
+.table tr > :last-child {
+  border-right: 0;
+}
+
+.table thead tr > th {
+  border-top: 0;
+}
+
+.table tbody tr:last-child > td {
+  border-bottom: 0;
+}
+
+/* An empty cell keeps a line of its own, as a cell of the editor does: an empty
+   row is as tall as any other. */
+.table td:empty::after,
+.table th:empty::after {
+  content: "\200b";
+}

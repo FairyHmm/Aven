@@ -1,0 +1,20 @@
+/* The cells picked as a block. Doubled, so it wins over the table's own rules
+   for a header cell (look.module.css) whatever the order the files load in. */
+.ranged.ranged {
+  background: color-mix(in oklab, var(--color-primary) 20%, transparent);
+  border-color: color-mix(
+    in oklab,
+    var(--color-primary-hover) 60%,
+    transparent
+  );
+}
+
+/* One outline round the whole block. Its corners follow the table's where it
+   reaches them (set from RangeOutline). */
+.outline {
+  position: absolute;
+  z-index: 1;
+  box-sizing: border-box;
+  pointer-events: none;
+  border: 2px solid var(--color-primary-hover);
+}
