@@ -1,9 +1,12 @@
 import { AlignLeft, Pencil, Workflow } from "lucide-react";
-import { useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 
+import { ResizeHandle } from "../../../../shared/components/ResizeHandle";
+import { useLiveSize } from "../../../../shared/hooks/useLiveSize";
 import { MarkdownView } from "../../../editor/components/MarkdownView";
 import { useBoardActions } from "../../hooks/useBoardActions";
 import {
+  useAnyEditing,
   useEditCard,
   useHoverCard,
   useIsEditing,
@@ -14,7 +17,7 @@ import { useGrow } from "../../hooks/useGrow";
 import { cardKind } from "../../lib/kind";
 import { tracksProgress } from "../../lib/props/defaults";
 import { ago } from "../../lib/time";
-import type { Card } from "../../lib/types";
+import { BODY_HEIGHT, type Card } from "../../lib/types";
 import { CardEditor } from "./CardEditor";
 import { ProgressBadge } from "./ProgressBadge";
 import { PropsRow } from "./PropsRow";
@@ -50,12 +53,25 @@ function ReadingTile({ card }: { card: Card }) {
   const open = useOpenCard();
   const edit = useEditCard();
   const hover = useHoverCard();
-  const { editCard } = useBoardActions();
+  const { editCard, resizeCard } = useBoardActions();
+  // Another card is being edited and the board is dimmed: nothing to resize.
+  const dimmed = useAnyEditing();
   const body = useRef<HTMLDivElement>(null);
+  // How much of the text the tile shows: dragged from its bottom edge.
+  const { live, size: shown, bind } = useLiveSize(card.height);
   const clamped = useClamped(body);
   const tile = useRef<HTMLDivElement>(null);
   const inner = useRef<HTMLDivElement>(null);
   useGrow(tile, inner, card.id);
+  // The column scrolls, so while the edge is dragged it is kept in view: the
+  // end of a tall card is never somewhere off screen.
+  useLayoutEffect(() => {
+    if (live !== undefined) {
+      tile.current
+        ?.querySelector<HTMLElement>('[role="separator"]')
+        ?.scrollIntoView({ block: "nearest" });
+    }
+  }, [live]);
 
   return (
     <div
@@ -64,6 +80,7 @@ function ReadingTile({ card }: { card: Card }) {
       role="button"
       tabIndex={0}
       data-card-id={card.id}
+      data-resizing={live === undefined ? undefined : ""}
       onPointerEnter={() => {
         hover(card.id);
       }}
@@ -104,10 +121,15 @@ function ReadingTile({ card }: { card: Card }) {
           }}
         />
         <span className={classes.title}>{card.title}</span>
-        {card.body !== "" && (
+        {(card.body !== "" || shown !== undefined) && (
           <div
             ref={body}
             className={classes.body}
+            style={
+              shown === undefined
+                ? undefined
+                : { height: shown, maxHeight: "none" }
+            }
             data-clamped={clamped ? "" : undefined}
           >
             <MarkdownView
@@ -128,6 +150,28 @@ function ReadingTile({ card }: { card: Card }) {
           <span>{ago(card.updatedAt)}</span>
         </div>
       </div>
+      {!dimmed && (
+        <ResizeHandle
+          axis="y"
+          label="Resize card"
+          value={shown ?? BODY_HEIGHT.initial}
+          min={BODY_HEIGHT.min}
+          max={BODY_HEIGHT.max}
+          size={() => body.current?.offsetHeight ?? 0}
+          {...bind(
+            next => {
+              resizeCard(card.id, next);
+            },
+            () => {
+              // Clamped: show all of it. Showing more than the default: back.
+              resizeCard(
+                card.id,
+                clamped ? body.current?.scrollHeight : undefined,
+              );
+            },
+          )}
+        />
+      )}
     </div>
   );
 }

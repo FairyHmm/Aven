@@ -7,6 +7,7 @@ import { renameTag } from "../lib/labels/renameTag";
 import * as ops from "../lib/mutations";
 import { applyPatch, fullPatch, isEmptyPatch } from "../lib/patch";
 import { rewriteValues } from "../lib/props/dropdowns";
+import { resizeCard, resizeColumn } from "../lib/resize";
 import { seedBoard } from "../lib/seed";
 import type {
   Accent,
@@ -23,6 +24,9 @@ export type BoardActions = {
   addColumn: (name: string) => void;
   renameColumn: (id: string, name: string) => void;
   recolorColumn: (id: string, accent: Accent) => void;
+  // undefined = the default size.
+  resizeColumn: (id: string, width: number | undefined) => void;
+  resizeCard: (id: string, height: number | undefined) => void;
   removeColumn: (id: string) => void;
   addCard: (columnId: string, text: string) => void;
   editCard: (
@@ -118,6 +122,12 @@ export const useBoardStore = create<BoardState>()((set, get) => {
     },
     recolorColumn: (id, accent) => {
       commit(data => ops.recolorColumn(data, id, accent));
+    },
+    resizeColumn: (id, width) => {
+      commit(data => resizeColumn(data, id, width));
+    },
+    resizeCard: (id, height) => {
+      commit(data => resizeCard(data, id, height));
     },
     removeColumn: id => {
       ghostOut(`column:${id}`);

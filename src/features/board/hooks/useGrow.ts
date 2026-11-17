@@ -69,6 +69,11 @@ export function useGrow(
       if (Math.abs(next - target) < 1) {
         return;
       }
+      // Being resized by hand: the tile follows the pointer, not an easing.
+      if (outer.hasAttribute("data-resizing")) {
+        target = next;
+        return;
+      }
       // From where it is right now if it is on its way somewhere; otherwise
       // from the height it had, as the layout has already moved on.
       const from =

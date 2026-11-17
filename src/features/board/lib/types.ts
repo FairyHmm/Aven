@@ -17,7 +17,13 @@ export type Column = {
   name: string;
   accent: Accent;
   order: string;
+  // Width in px; unset = the default (COLUMN_WIDTH).
+  width?: number;
 };
+
+export const COLUMN_WIDTH = { initial: 280, min: 200, max: 720 } as const;
+// How tall a tile shows a card's text before it fades out; unset = initial.
+export const BODY_HEIGHT = { initial: 176, min: 24, max: 20000 } as const;
 
 // One property value: text, number, checkbox, date / date & time (as an ISO
 // string) or a list of strings. See lib/props.ts.
@@ -43,6 +49,8 @@ export type Card = {
   props: Props;
   // Markdown document, without the frontmatter.
   body: string;
+  // Height in px a tile shows of the body; unset = BODY_HEIGHT.initial.
+  height?: number;
   order: string;
   createdAt: number;
   updatedAt: number;

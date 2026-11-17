@@ -1,10 +1,12 @@
 /* Sortable wrapper: the flex item in the lane. */
 .slot {
-  flex: 0 0 280px;
-  width: 280px;
+  flex: none;
 }
 
+/* The column has its own width (inline: what is stored, or what the edge is
+   dragged to), so the wrapper just follows it. */
 .column {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 8px;

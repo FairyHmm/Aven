@@ -24,6 +24,11 @@ export function useIsEditing(id: string) {
   return useEditorStore(state => state.editingId === id);
 }
 
+// Whether any card is being edited in place (the rest of the board is dimmed).
+export function useAnyEditing() {
+  return useEditorStore(state => state.editingId !== undefined);
+}
+
 // The card open in the modal, if any, and how to close it.
 export function useOpenedCard() {
   const openId = useEditorStore(state => state.openId);

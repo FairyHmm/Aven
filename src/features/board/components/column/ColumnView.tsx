@@ -1,11 +1,14 @@
 import { useRef, useState } from "react";
 
+import { ResizeHandle } from "../../../../shared/components/ResizeHandle";
 import { SortableItem } from "../../../../shared/components/SortableItem";
 import { useAutoScroll } from "../../../../shared/hooks/useAutoScroll";
+import { useLiveSize } from "../../../../shared/hooks/useLiveSize";
 import { useSortableList } from "../../../../shared/hooks/useSortableList";
 import { useBoardActions } from "../../hooks/useBoardActions";
+import { useAnyEditing } from "../../hooks/useCardEditor";
 import { useColumnCards } from "../../hooks/useColumnCards";
-import type { Column } from "../../lib/types";
+import { COLUMN_WIDTH, type Column } from "../../lib/types";
 import { CardComposer } from "../card/CardComposer";
 import { CardSlot } from "../card/CardSlot";
 import { InlineEdit } from "../InlineEdit";
@@ -26,6 +29,9 @@ export function ColumnView({ column, index, count }: Props) {
   const section = useRef<HTMLElement>(null);
   const list = useRef<HTMLDivElement>(null);
   const [renaming, setRenaming] = useState(false);
+  const editing = useAnyEditing();
+  const { size, bind } = useLiveSize(column.width);
+  const width = size ?? COLUMN_WIDTH.initial;
   const { over, emptySize } = useSortableList(section, {
     kind: "card",
     listId: column.id,
@@ -62,6 +68,7 @@ export function ColumnView({ column, index, count }: Props) {
         data-accent={column.accent}
         data-over={over}
         aria-label={column.name}
+        style={{ width }}
       >
         <header className={classes.header} data-drag-handle>
           <span className={classes.dot} aria-hidden="true" />
@@ -114,6 +121,25 @@ export function ColumnView({ column, index, count }: Props) {
         <footer className={classes.footer}>
           <CardComposer columnId={column.id} />
         </footer>
+
+        {!editing && (
+          <ResizeHandle
+            axis="x"
+            label={`Resize ${column.name}`}
+            value={width}
+            min={COLUMN_WIDTH.min}
+            max={COLUMN_WIDTH.max}
+            size={() => section.current?.offsetWidth ?? width}
+            {...bind(
+              next => {
+                actions.resizeColumn(column.id, next);
+              },
+              () => {
+                actions.resizeColumn(column.id, undefined);
+              },
+            )}
+          />
+        )}
       </section>
     </SortableItem>
   );

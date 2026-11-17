@@ -35,6 +35,7 @@ function toColumn(id: string, data: DocumentData): Column {
     name: text(data.name, "Untitled"),
     accent: isAccent(data.accent) ? data.accent : "indigo",
     order: text(data.order, "a0"),
+    ...(typeof data.width === "number" ? { width: data.width } : {}),
   };
 }
 
@@ -45,6 +46,7 @@ function toCard(id: string, data: DocumentData): Card {
     title: text(data.title, "Untitled"),
     props: toProps(data.props),
     body: text(data.body, ""),
+    ...(typeof data.height === "number" ? { height: data.height } : {}),
     order: text(data.order, "a0"),
     createdAt: num(data.createdAt, 0),
     updatedAt: num(data.updatedAt, 0),

@@ -49,7 +49,8 @@
 }
 
 /* Pressing a control inside the card must not shift it from under the pointer. */
-.card:has([role="checkbox"]:active) {
+.card:has([role="checkbox"]:active),
+.card:has([role="separator"]:active) {
   transform: translateY(-1px);
 }
 
@@ -115,7 +116,7 @@
 
 /* The card's markdown, read-only and clamped. */
 .body {
-  max-height: 11rem;
+  max-height: 11rem; /* BODY_HEIGHT.initial; a card's own height is inline */
   overflow: hidden;
   font-size: 0.8rem;
 }
