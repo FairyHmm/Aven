@@ -1,0 +1,30 @@
+.inline {
+  display: inline;
+}
+
+.display {
+  display: block;
+  margin: 0.6em 0;
+  overflow-x: auto;
+  text-align: center;
+}
+
+.display > svg {
+  display: inline-block;
+}
+
+.pending {
+  color: var(--mantine-color-dimmed);
+  font-family: var(--mantine-font-family-monospace);
+}
+
+/* The floating copy of a formula being edited. */
+.preview {
+  max-width: min(90vw, 640px);
+  overflow-x: auto;
+  pointer-events: none;
+}
+
+.preview .display {
+  margin: 0;
+}
