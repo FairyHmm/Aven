@@ -39,7 +39,7 @@
 .markdown ol,
 .markdown pre,
 .markdown blockquote,
-.markdown table {
+.tableBox {
   margin: 0 0 0.8em;
 }
 
@@ -98,31 +98,33 @@
     color-mix(in oklab, var(--color-border) 35%, transparent);
 }
 
-.markdown table {
-  display: block;
-  max-width: 100%;
-  overflow-x: auto;
-  border-collapse: collapse;
-}
-
-.markdown th,
-.markdown td {
-  padding: 4px 10px;
-  border: 1px solid color-mix(in oklab, var(--color-border) 30%, transparent);
-}
-
-/* Diagrams sit directly on the surface behind them: no box. */
+/* Diagrams sit directly on the surface behind them: no box. Pele takes its
+   colours from these variables and its width from this box, so a narrow tile
+   re-flows the diagram instead of shrinking it. */
 .diagram {
-  display: flex;
-  justify-content: center;
+  --pele-bg: var(--color-bg-card);
+  --pele-fg: var(--color-text);
+  --pele-fg-on-light: var(--color-bg-deep);
+  --pele-fg-on-dark: var(--color-text);
+  --pele-muted: var(--color-text-subtle);
+  --pele-line: var(--color-ac);
+  --pele-surface: var(--color-bg-hover);
+  --pele-surface-alt: var(--color-bg);
+  --pele-border: var(--color-border);
+  --pele-accent: var(--accent-indigo);
+  --pele-critical: var(--color-danger);
+  --pele-error: var(--color-danger);
+  --pele-series-1: var(--accent-indigo);
+  --pele-series-2: var(--accent-amber);
+  --pele-series-3: var(--accent-emerald);
+  --pele-series-4: var(--accent-rose);
+  --pele-series-5: var(--accent-sky);
+  --pele-series-6: var(--accent-violet);
+  --pele-radius: 6px;
+
+  display: block;
   min-height: 3rem;
   margin: 0 0 0.8em;
-  overflow-x: auto;
-}
-
-.diagram svg {
-  max-width: 100%;
-  height: auto;
 }
 
 .diagramError {

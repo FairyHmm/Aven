@@ -3,6 +3,7 @@ import {
   type MantineColorsTuple,
   Popover,
   type PopoverProps,
+  Tooltip,
 } from "@mantine/core";
 
 // Slate ramp from theme.css, arranged for Mantine's dark-surface slots:
@@ -45,6 +46,18 @@ export const theme = createTheme({
   components: {
     Popover: Popover.extend({
       defaultProps: { shadow: "md", middlewares: onScreen },
+    }),
+    // The app's own surface, not Mantine's inverted one (white in the dark
+    // theme).
+    Tooltip: Tooltip.extend({
+      styles: {
+        tooltip: {
+          color: "var(--color-text)",
+          backgroundColor: "var(--color-bg-deep)",
+          border: "1px solid var(--color-border)",
+          fontSize: "var(--mantine-font-size-xs)",
+        },
+      },
     }),
     AppShell: {
       styles: {

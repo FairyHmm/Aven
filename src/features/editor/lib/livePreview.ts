@@ -8,9 +8,13 @@ import {
   type ViewUpdate,
 } from "@codemirror/view";
 
+import { findHighlights } from "./highlight/highlights";
+import { findHtmlPairs } from "./html/tags";
+import { inCode } from "./inCode";
 import { hiddenMarkRanges } from "./marks";
 
 const hide = Decoration.replace({});
+const codeLine = Decoration.line({ class: "aven-code" });
 
 function build(view: EditorView): DecorationSet {
   const { state } = view;
@@ -28,6 +32,60 @@ function build(view: EditorView): DecorationSet {
       decorations.push(hide.range(from, to));
     }
   }
+  // The `==` around a highlight, until the caret is in it.
+  for (const { from, to } of view.visibleRanges) {
+    for (let pos = from; pos <= to;) {
+      const line = state.doc.lineAt(pos);
+      pos = line.to + 1;
+      if (!line.text.includes("==") || inCode(state, line.from)) {
+        continue;
+      }
+      for (const found of findHighlights(line.text, line.from)) {
+        if (!selection.some(r => r.from <= found.to && r.to >= found.from)) {
+          // The colour circle is a key, not text: it is hidden with the marks.
+          decorations.push(
+            hide.range(found.from, found.from + 2 + (found.emoji?.length ?? 0)),
+          );
+          decorations.push(hide.range(found.to - 2, found.to));
+        }
+      }
+    }
+  }
+  // `<sub>2</sub>` and the like: the tags hide, and the text between shows as
+  // what the tag says, until the caret is in it.
+  for (const { from, to } of view.visibleRanges) {
+    for (let pos = from; pos <= to;) {
+      const line = state.doc.lineAt(pos);
+      pos = line.to + 1;
+      if (!line.text.includes("</") || inCode(state, line.from)) {
+        continue;
+      }
+      for (const pair of findHtmlPairs(line.text, line.from)) {
+        decorations.push(
+          Decoration.mark({ class: `aven-html-${pair.tag}` }).range(
+            pair.openEnd,
+            pair.closeStart,
+          ),
+        );
+        if (!selection.some(r => r.from <= pair.to && r.to >= pair.from)) {
+          decorations.push(hide.range(pair.from, pair.openEnd));
+          decorations.push(hide.range(pair.closeStart, pair.to));
+        }
+      }
+    }
+  }
+  // Fenced code gets a block of its own, line by line.
+  tree.iterate({
+    enter: node => {
+      if (node.name !== "FencedCode") {
+        return;
+      }
+      const last = state.doc.lineAt(node.to).number;
+      for (let n = state.doc.lineAt(node.from).number; n <= last; n += 1) {
+        decorations.push(codeLine.range(state.doc.line(n).from));
+      }
+    },
+  });
   return Decoration.set(decorations, true);
 }
 

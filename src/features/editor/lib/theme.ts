@@ -24,6 +24,34 @@ const frame = EditorView.theme(
       caretColor: "var(--color-text)",
     },
     ".cm-line": { padding: "0" },
+    ".aven-code": {
+      padding: "0 8px",
+      fontFamily: "var(--mantine-font-family-monospace)",
+      fontSize: "0.9em",
+      background: "var(--color-bg-deep)",
+    },
+    ".aven-html-b": { fontWeight: "700" },
+    ".aven-html-i": { fontStyle: "italic" },
+    ".aven-html-u, .aven-html-ins": { textDecoration: "underline" },
+    ".aven-html-small": { fontSize: "0.8em" },
+    ".aven-html-sub, .aven-html-sup": { fontSize: "0.75em" },
+    ".aven-html-sub": { verticalAlign: "sub" },
+    ".aven-html-sup": { verticalAlign: "super" },
+    ".aven-html-mark": {
+      padding: "0 0.2em",
+      background: "color-mix(in oklab, var(--color-primary) 30%, transparent)",
+      borderRadius: "3px",
+    },
+    ".aven-html-kbd": {
+      padding: "0 0.35em",
+      fontFamily: "var(--font-mono, monospace)",
+      fontSize: "0.88em",
+      border:
+        "1px solid color-mix(in oklab, var(--color-border) 60%, transparent)",
+      borderRadius: "4px",
+    },
+    ".aven-bullet": { color: "var(--color-ac)", paddingRight: "0.5em" },
+    ".aven-diagram": { padding: "4px 0" },
     ".cm-cursor": { borderLeftColor: "var(--color-text)" },
     "&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground, .cm-selectionBackground":
       { background: "var(--color-primary-muted)" },
@@ -57,6 +85,28 @@ const highlight = HighlightStyle.define([
   { tag: tags.list, color: "var(--color-ac)" },
   { tag: tags.contentSeparator, color: "var(--color-fg)" },
   { tag: tags.meta, color: "var(--color-fg)" },
+  // Code inside fences.
+  {
+    tag: [tags.keyword, tags.controlKeyword, tags.definitionKeyword],
+    color: "var(--accent-violet)",
+  },
+  { tag: [tags.string, tags.regexp], color: "var(--accent-emerald)" },
+  {
+    tag: [tags.number, tags.bool, tags.null, tags.atom],
+    color: "var(--accent-amber)",
+  },
+  {
+    tag: [tags.comment, tags.lineComment, tags.blockComment],
+    color: "var(--color-fg)",
+    fontStyle: "italic",
+  },
+  {
+    tag: [tags.function(tags.variableName), tags.propertyName],
+    color: "var(--accent-sky)",
+  },
+  { tag: [tags.typeName, tags.className], color: "var(--accent-amber)" },
+  { tag: [tags.tagName, tags.attributeName], color: "var(--accent-rose)" },
+  { tag: tags.operator, color: "var(--color-ac)" },
 ]);
 
 export const editorTheme = [frame, syntaxHighlighting(highlight)];

@@ -4,30 +4,33 @@ import {
   historyKeymap,
   indentWithTab,
 } from "@codemirror/commands";
-import {
-  insertNewlineContinueMarkup,
-  markdown,
-  markdownLanguage,
-} from "@codemirror/lang-markdown";
-import { EditorState, Prec, type Extension } from "@codemirror/state";
+import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
+import { languages } from "@codemirror/language-data";
+import { EditorState } from "@codemirror/state";
 import { EditorView, keymap, placeholder } from "@codemirror/view";
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useGrow } from "../../board/hooks/useGrow";
+import { useEditorMenu } from "../hooks/useEditorMenu";
+import { useHints } from "../hooks/useHints";
+import { useMathPreview } from "../hooks/useMathPreview";
+import { highlightMarks } from "../lib/highlight/decorations";
+import { htmlBlocks } from "../lib/html/blocks";
 import { livePreview } from "../lib/livePreview";
+import { mathWidgets } from "../lib/math/widgets";
+import { tables } from "../lib/table/widget";
 import { compactTheme, editorTheme } from "../lib/theme";
 import { titleLine } from "../lib/titleLine";
+import { diagrams } from "../lib/widgets/diagrams";
+import { hubFacet, WidgetHub } from "../lib/widgets/hub";
+import { listWidgets } from "../lib/widgets/lists";
+import { editorKeys, type Handlers } from "./editorKeys";
+import { MathPreview } from "./math/MathPreview";
+import { EditorMenu } from "./menu/EditorMenu";
+import { HintMenu } from "./menu/HintMenu";
+import { EditorWidgets } from "./widgets/EditorWidgets";
 
 import classes from "./codeEditor.module.css";
-
-type Handlers = {
-  onChange: (value: string) => void;
-  // Ctrl/⌘ + Enter (and plain Enter with `enterSubmits`).
-  onSubmit: () => void;
-  onEscape?: (() => void) | undefined;
-  // Focus left the editor (not merely the window).
-  onBlur?: (() => void) | undefined;
-};
 
 type Props = Handlers & {
   // Read once, when the editor mounts; the editor owns the text afterwards.
@@ -43,37 +46,6 @@ type Props = Handlers & {
   autoFocus?: boolean | undefined;
   hint?: string | undefined;
 };
-
-function keys(handlers: RefObject<Handlers>, enterSubmits: boolean): Extension {
-  // Enter that is confirming an IME composition must not submit.
-  const submit = (view: EditorView) => {
-    if (view.composing) {
-      return false;
-    }
-    handlers.current.onSubmit();
-    return true;
-  };
-  const escape = () => {
-    const leave = handlers.current.onEscape;
-    if (leave === undefined) {
-      return false;
-    }
-    leave();
-    return true;
-  };
-  return Prec.highest(
-    keymap.of([
-      { key: "Mod-Enter", run: submit },
-      { key: "Escape", run: escape },
-      ...(enterSubmits
-        ? [
-            { key: "Enter", run: submit },
-            { key: "Shift-Enter", run: insertNewlineContinueMarkup },
-          ]
-        : []),
-    ]),
-  );
-}
 
 // CodeMirror 6 markdown editor with live preview.
 // Uncontrolled: caller remounts (key) to reset; edits flow through `onChange`.
@@ -93,6 +65,13 @@ export function CodeEditor({
   // under it follows. One inside a tile leaves that to the tile.
   const frame = useRef<HTMLDivElement>(null);
   useGrow(frame, host, undefined, !compact);
+  // Task boxes, diagrams, formulas and tables are React, drawn into nodes the
+  // editor reserves.
+  const [hub] = useState(() => new WidgetHub());
+  const menu = useEditorMenu();
+  const hints = useHints();
+  const math = useMathPreview();
+  const { extension: menuExtension, view: menuView, open: menuOpen } = menu;
   const handlers = useRef<Handlers>(callbacks);
   const initial = useRef(initialValue);
 
@@ -111,11 +90,22 @@ export function CodeEditor({
       state: EditorState.create({
         doc: initial.current,
         extensions: [
-          keys(handlers, enterSubmits),
+          editorKeys(handlers, enterSubmits),
           history(),
           keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
-          markdown({ base: markdownLanguage }),
+          // Fenced code is highlighted in its own language, loaded on demand.
+          markdown({ base: markdownLanguage, codeLanguages: languages }),
+          hubFacet.of(hub),
+          menuExtension,
           livePreview,
+          listWidgets,
+          highlightMarks,
+          hints.extension,
+          diagrams,
+          mathWidgets,
+          math.extension,
+          htmlBlocks,
+          tables,
           editorTheme,
           compact ? compactTheme : [],
           firstLineTitle ? titleLine : [],
@@ -130,7 +120,7 @@ export function CodeEditor({
           EditorView.domEventHandlers({
             blur: () => {
               // Switching windows is not leaving the editor.
-              if (alive && document.hasFocus()) {
+              if (alive && document.hasFocus() && !menuOpen.current) {
                 handlers.current.onBlur?.();
               }
               return false;
@@ -139,21 +129,43 @@ export function CodeEditor({
         ],
       }),
     });
+    menuView.current = view;
     if (autoFocus) {
       view.dispatch({ selection: { anchor: view.state.doc.length } });
       view.focus();
     }
     return () => {
       alive = false;
+      menuView.current = null;
       view.destroy();
     };
-  }, [label, firstLineTitle, compact, enterSubmits, autoFocus, hint]);
+  }, [
+    label,
+    firstLineTitle,
+    compact,
+    enterSubmits,
+    autoFocus,
+    hint,
+    hub,
+    math.extension,
+    menuExtension,
+    menuView,
+    menuOpen,
+  ]);
 
-  return compact ? (
-    <div ref={host} />
-  ) : (
-    <div ref={frame} className={classes.frame}>
-      <div ref={host} />
-    </div>
+  return (
+    <>
+      {compact ? (
+        <div ref={host} />
+      ) : (
+        <div ref={frame} className={classes.frame}>
+          <div ref={host} />
+        </div>
+      )}
+      <EditorWidgets hub={hub} />
+      <EditorMenu menu={menu} />
+      <HintMenu state={hints} />
+      <MathPreview shown={math.shown} />
+    </>
   );
 }

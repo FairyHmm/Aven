@@ -10,3 +10,9 @@
   outline: 2px solid var(--color-primary-hover);
   outline-offset: 1px;
 }
+
+/* The box of a task inside the editor: it takes the place of the list marker. */
+.taskHost {
+  display: inline-flex;
+  vertical-align: top;
+}

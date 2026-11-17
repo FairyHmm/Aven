@@ -12,10 +12,11 @@ const INLINE_PARENTS = new Set([
 const HEADING = /^ATXHeading[1-6]$/;
 
 // Which marker characters of the markdown source the live preview hides: the
-// `#` of a heading, the `**`/`*`/`~~` around emphasis and the backticks of
-// inline code. Markers stay visible while a selection touches the element
-// they belong to, so the source is there to edit. `nextChar` reads one
-// character of the document; ranges are returned in document order.
+// `#` of a heading, the `**`/`*`/`~~` around emphasis, the backticks of
+// inline code, the brackets and address of a link and the `>` of a quote.
+// Markers stay visible while a selection touches the element they belong to,
+// so the source is there to edit. `nextChar` reads one character of the
+// document; ranges are returned in document order.
 export function hiddenMarkRanges(
   tree: Tree,
   selection: readonly Span[],
@@ -38,7 +39,9 @@ export function hiddenMarkRanges(
         return;
       }
       // A heading's `#` also takes the space that follows it.
-      const gap = node.name === "HeaderMark" && nextChar(node.to) === " ";
+      const gap =
+        (node.name === "HeaderMark" || node.name === "QuoteMark") &&
+        nextChar(node.to) === " ";
       hidden.push({ from: node.from, to: gap ? node.to + 1 : node.to });
     },
   });
@@ -51,6 +54,13 @@ function isHideable(name: string, parent: string): boolean {
       return HEADING.test(parent);
     case "CodeMark":
       return parent === "InlineCode";
+    // `[text](url "title")`: only the text stays, until the link is edited.
+    case "LinkMark":
+    case "URL":
+    case "LinkTitle":
+      return parent === "Link";
+    case "QuoteMark":
+      return parent === "Blockquote";
     case "EmphasisMark":
     case "StrikethroughMark":
       return INLINE_PARENTS.has(parent);

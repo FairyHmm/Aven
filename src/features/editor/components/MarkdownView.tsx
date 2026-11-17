@@ -1,20 +1,27 @@
-import { useCallback } from "react";
+import { type ReactNode, useCallback } from "react";
 import Markdown, {
   type Components,
   type ExtraProps,
   type Options,
 } from "react-markdown";
 import rehypeCallouts from "rehype-callouts";
+import rehypeHighlight from "rehype-highlight";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
 
-import { rehypeTableMerge } from "../lib/tableMerge";
+import { remarkHighlight } from "../lib/highlight/remark";
+import { rehypeHtml, remarkHtmlOptions } from "../lib/html/sanitize";
+import { remarkInlineMath } from "../lib/math/remarkInline";
+import { rehypeTableMerge } from "../lib/table/merge";
 import { asTaskState, remarkTasks, type TaskState } from "../lib/tasks";
-import { MermaidBlock } from "./MermaidBlock";
-import { TaskContext, TaskItem } from "./TaskItem";
+import { MermaidBlock } from "./diagram/MermaidBlock";
+import { MathView } from "./math/MathView";
+import { TaskContext, TaskItem } from "./task/TaskItem";
 
 import calloutClasses from "./callouts.module.css";
 import markdownClasses from "./markdown.module.css";
+import tableLook from "./table/look.module.css";
 
 type PreProps = ExtraProps;
 
@@ -33,8 +40,31 @@ function mermaidSource(node: PreProps["node"]): string | undefined {
     .join("");
 }
 
+// The formula of a `$$` block (remark-math makes it a code element in a pre).
+function mathSource(node: PreProps["node"]): string | undefined {
+  const code = node?.children[0];
+  if (code?.type !== "element" || code.tagName !== "code") {
+    return undefined;
+  }
+  const names = code.properties["className"];
+  if (!Array.isArray(names) || !names.includes("language-math")) {
+    return undefined;
+  }
+  return code.children
+    .map(child => (child.type === "text" ? child.value : ""))
+    .join("");
+}
+
+function textOf(children: ReactNode): string {
+  return typeof children === "string" ? children : "";
+}
+
 const components: Components = {
   pre: ({ node, children }) => {
+    const formula = mathSource(node);
+    if (formula !== undefined) {
+      return <MathView tex={formula.trim()} display />;
+    }
     const source = mermaidSource(node);
     return source === undefined ? (
       <pre>{children}</pre>
@@ -42,10 +72,22 @@ const components: Components = {
       <MermaidBlock source={source} />
     );
   },
+  // `$x$` (a `$$` block is a pre, above).
+  code: ({ node: _node, className, children }) =>
+    className?.split(" ").includes("language-math") === true ? (
+      <MathView tex={textOf(children).trim()} display={false} />
+    ) : (
+      <code className={className}>{children}</code>
+    ),
   li: ({ node, children }) => {
     const state = asTaskState(node?.properties["dataTask"]);
-    const offset = node?.properties["dataOffset"];
-    return state !== undefined && typeof offset === "number" ? (
+    // A number when our plugin sets it, a string once the HTML step has parsed
+    // the tree again (see rehypeHtml).
+    const raw = node?.properties["dataOffset"];
+    const offset = typeof raw === "string" ? Number(raw) : raw;
+    return state !== undefined &&
+      typeof offset === "number" &&
+      Number.isFinite(offset) ? (
       <TaskItem state={state} offset={offset}>
         {children}
       </TaskItem>
@@ -53,6 +95,12 @@ const components: Components = {
       <li>{children}</li>
     );
   },
+  // The same frame and look as the table editor.
+  table: ({ node: _node, children }) => (
+    <div className={`${tableLook.frame} ${markdownClasses.tableBox}`}>
+      <table className={tableLook.table}>{children}</table>
+    </div>
+  ),
   summary: ({ node: _node, children, className }) => (
     // The header of a foldable callout: the click folds it and must not also
     // open the card around it.
@@ -72,13 +120,22 @@ const components: Components = {
   ),
 };
 
-const plugins = [remarkGfm, remarkFrontmatter, remarkTasks];
+const plugins: NonNullable<Options["remarkPlugins"]> = [
+  remarkGfm,
+  [remarkMath, { singleDollarTextMath: false }],
+  remarkInlineMath,
+  remarkFrontmatter,
+  remarkTasks,
+  remarkHighlight,
+];
 
 // Obsidian-style callouts (`> [!note] Title`, `+`/`-` for foldable, GitHub's
 // `[!NOTE]` too). The plugin supplies the markup and the lucide icons; the
 // look is ours (markdown.module.css), so its class names are replaced with
 // the module's. Folding is a native <details>, no script.
 const rehypePlugins: NonNullable<Options["rehypePlugins"]> = [
+  // HTML first, sanitized; the plugins after it add their own markup.
+  ...rehypeHtml,
   [
     rehypeCallouts,
     {
@@ -95,6 +152,8 @@ const rehypePlugins: NonNullable<Options["rehypePlugins"]> = [
   ],
   // Table cells: `^` merges into the cell above, `<` into the one to the left.
   rehypeTableMerge,
+  // Fenced code in a named language; mermaid and unknown ones are left alone.
+  [rehypeHighlight, { detect: false, ignoreMissing: true }],
 ];
 
 type Props = {
@@ -105,8 +164,7 @@ type Props = {
 };
 
 // Renders a card body: GFM, frontmatter hidden, mermaid fences as diagrams,
-// task lists as clickable boxes. Properties from the frontmatter get their
-// own UI later.
+// task lists as clickable boxes.
 export function MarkdownView({ body, onBodyChange }: Props) {
   const setTask = useCallback(
     (offset: number, state: TaskState) => {
@@ -122,7 +180,10 @@ export function MarkdownView({ body, onBodyChange }: Props) {
         <Markdown
           remarkPlugins={plugins}
           rehypePlugins={rehypePlugins}
-          remarkRehypeOptions={{ handlers: { yaml: () => undefined } }}
+          remarkRehypeOptions={{
+            ...remarkHtmlOptions,
+            handlers: { yaml: () => undefined },
+          }}
           components={components}
         >
           {body}

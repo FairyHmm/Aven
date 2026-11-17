@@ -42,4 +42,21 @@ describe("hiddenMarkRanges", () => {
   it("leaves fenced code fences alone", () => {
     expect(hiddenIn("```js\nlet a = 1;\n```\n\ntext", 24)).toEqual([]);
   });
+
+  it("hides a link down to its text, and a quote's marker", () => {
+    const text = "see [the docs](https://x.dev) now\n\n> quoted\n\nend";
+    const hidden = hiddenIn(text, text.length);
+    const link = text.indexOf("[the");
+    expect(hidden).toContainEqual({ from: link, to: link + 1 });
+    expect(hidden.some(span => span.from === text.indexOf("https"))).toBe(true);
+    expect(hidden).toContainEqual({
+      from: text.indexOf("> quoted"),
+      to: text.indexOf("> quoted") + 2,
+    });
+  });
+
+  it("shows a link whole while the cursor is in it", () => {
+    const text = "see [the docs](https://x.dev) now";
+    expect(hiddenIn(text, 8)).toEqual([]);
+  });
 });

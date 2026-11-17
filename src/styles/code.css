@@ -1,0 +1,103 @@
+/* Global because the class names come from libraries (CodeMirror's lines,
+   highlight.js' tokens). */
+
+/* An unchecked task box in the editor only shows while its line is hovered, as
+   in a card's read view (task.module.css). */
+.cm-line:hover .aven-task [data-empty] {
+  width: 1.4em;
+}
+
+.cm-line:hover .aven-task [data-state=" "] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Code highlighting of the read view (rehype-highlight's classes). */
+.hljs-keyword,
+.hljs-selector-tag {
+  color: var(--accent-violet);
+}
+
+.hljs-string,
+.hljs-regexp {
+  color: var(--accent-emerald);
+}
+
+.hljs-number,
+.hljs-literal {
+  color: var(--accent-amber);
+}
+
+.hljs-comment {
+  font-style: italic;
+  color: var(--color-fg);
+}
+
+.hljs-title,
+.hljs-attr,
+.hljs-property {
+  color: var(--accent-sky);
+}
+
+.hljs-type,
+.hljs-built_in {
+  color: var(--accent-amber);
+}
+
+.hljs-tag,
+.hljs-name {
+  color: var(--accent-rose);
+}
+
+/* ==Highlights==: the colour of each hue, for the editor and the read view. */
+[data-hue="default"] {
+  --hl: var(--color-primary-hover);
+}
+
+[data-hue="red"] {
+  --hl: var(--accent-rose);
+}
+
+[data-hue="orange"] {
+  --hl: oklch(75% 0.17 55);
+}
+
+[data-hue="yellow"] {
+  --hl: var(--color-warning);
+}
+
+[data-hue="green"] {
+  --hl: var(--accent-emerald);
+}
+
+[data-hue="blue"] {
+  --hl: var(--accent-sky);
+}
+
+[data-hue="purple"] {
+  --hl: var(--accent-violet);
+}
+
+[data-hue="brown"] {
+  --hl: oklch(62% 0.08 55);
+}
+
+[data-hue="gray"] {
+  --hl: var(--color-ac);
+}
+
+[data-hue="white"] {
+  --hl: oklch(95% 0 0);
+}
+
+mark[data-hue],
+.aven-mark {
+  padding: 0 2px;
+  color: inherit;
+  background: color-mix(
+    in oklab,
+    var(--hl, var(--color-primary-hover)) 34%,
+    transparent
+  );
+  border-radius: 3px;
+}

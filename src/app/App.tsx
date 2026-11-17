@@ -1,6 +1,7 @@
 import "@mantine/core/styles.css";
 import "../styles/theme.css";
 import "../styles/dnd.css";
+import "../styles/code.css";
 import { MantineProvider } from "@mantine/core";
 import { RouterProvider } from "@tanstack/react-router";
 
