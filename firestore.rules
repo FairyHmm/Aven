@@ -2,9 +2,63 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Deny-all until the real rules land.
-    match /{document=**} {
-      allow read, write: if false;
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function spaceDoc(spaceId) {
+      return get(/databases/$(database)/documents/spaces/$(spaceId)).data;
+    }
+
+    function isSpaceMember(spaceId) {
+      return signedIn() && request.auth.uid in spaceDoc(spaceId).memberIds;
+    }
+
+    function spaceRole(spaceId) {
+      return spaceDoc(spaceId).members[request.auth.uid].role;
+    }
+
+    function canEditSpace(spaceId) {
+      return isSpaceMember(spaceId) && spaceRole(spaceId) in ['owner', 'editor'];
+    }
+
+    // Minimal user profiles used to look up collaborators by email.
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow create, update: if signedIn() && request.auth.uid == uid;
+      allow delete: if false;
+    }
+
+    match /spaces/{spaceId} {
+      allow read: if signedIn() && request.auth.uid in resource.data.memberIds;
+      allow create: if signedIn()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.auth.uid in request.resource.data.memberIds;
+      allow update: if isSpaceMember(spaceId) && (
+        // Owners can change anything, including membership and settings.
+        spaceRole(spaceId) == 'owner' ||
+        // Editors can update space metadata/settings but never ownership or membership.
+        (
+          spaceRole(spaceId) == 'editor' &&
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['ownerId', 'memberIds', 'members'])
+        )
+      );
+      allow delete: if signedIn() && resource.data.ownerId == request.auth.uid;
+
+      match /boards/{boardId} {
+        allow read: if isSpaceMember(spaceId);
+        allow write: if canEditSpace(spaceId);
+
+        match /columns/{columnId} {
+          allow read: if isSpaceMember(spaceId);
+          allow write: if canEditSpace(spaceId);
+        }
+
+        match /cards/{cardId} {
+          allow read: if isSpaceMember(spaceId);
+          allow write: if canEditSpace(spaceId);
+        }
+      }
     }
   }
 }

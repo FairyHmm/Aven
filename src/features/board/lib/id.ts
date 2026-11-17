@@ -1,3 +1,1 @@
-export function newId(): string {
-  return crypto.randomUUID();
-}
+export { newId } from "../../../shared/lib/id";

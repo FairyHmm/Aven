@@ -1,6 +1,7 @@
 import {
   CalendarDays,
   CircleChevronDown,
+  Paperclip,
   SquareCheck,
   Tag,
   TextCursorInput,
@@ -18,6 +19,7 @@ import classes from "../pickers/pickers.module.css";
 type Buttons = {
   props: Props;
   onChange: (props: Props) => void;
+  onAttach?: () => void;
   // Which popup is open, when something else (the sections under the buttons)
   // can open them too; otherwise the buttons keep track themselves.
   popup?: {
@@ -41,11 +43,14 @@ function filled(kind: PopupKind, props: Props): boolean {
   if (kind === "labels") {
     return KEYS.tags in props;
   }
+  if (kind === "members") {
+    return KEYS.members in props;
+  }
   return kind === "dates" && (KEYS.due in props || KEYS.start in props);
 }
 
 // Built-in property buttons plus "Field" and "Dropdown" for adding new fields.
-export function PropButtons({ props, onChange, popup }: Buttons) {
+export function PropButtons({ props, onChange, onAttach, popup }: Buttons) {
   const [own, setOwn] = useState<PopupKind>();
   const open = popup ? popup.open : own;
   const setOpen = popup ? popup.set : setOwn;
@@ -103,6 +108,14 @@ export function PropButtons({ props, onChange, popup }: Buttons) {
           onClick={() => {
             onChange(withProgress(props, true));
           }}
+        />
+      )}
+      {onAttach !== undefined && (
+        <ActionButton
+          compact
+          label="Attach"
+          icon={<Paperclip size={13} />}
+          onClick={onAttach}
         />
       )}
     </div>

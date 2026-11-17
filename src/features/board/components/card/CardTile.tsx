@@ -1,4 +1,4 @@
-import { AlignLeft, Pencil, Workflow } from "lucide-react";
+import { AlignLeft, Paperclip, Pencil, Workflow } from "lucide-react";
 import { useLayoutEffect, useRef } from "react";
 
 import { ResizeHandle } from "../../../../shared/components/ResizeHandle";
@@ -147,6 +147,11 @@ function ReadingTile({ card }: { card: Card }) {
             card.body !== "" && <AlignLeft size={12} aria-label="Has notes" />
           )}
           {tracksProgress(card.props) && <ProgressBadge body={card.body} />}
+          {(card.attachments?.length ?? 0) > 0 && (
+            <span aria-label={`${card.attachments?.length} attachments`}>
+              <Paperclip size={12} /> {card.attachments?.length}
+            </span>
+          )}
           <span>{ago(card.updatedAt)}</span>
         </div>
       </div>

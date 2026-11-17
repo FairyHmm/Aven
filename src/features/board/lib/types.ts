@@ -41,6 +41,17 @@ export type PopupKind = PropertyPopup | NewFieldKind;
 export type PropValue = string | number | boolean | string[];
 export type Props = Record<string, PropValue>;
 
+export type Attachment = {
+  id: string;
+  name: string;
+  size: number;
+  contentType: string;
+  url: string;
+  storagePath: string;
+  uploadedBy: string;
+  uploadedAt: number;
+};
+
 export type Card = {
   id: string;
   columnId: string;
@@ -52,6 +63,7 @@ export type Card = {
   // Height in px a tile shows of the body; unset = BODY_HEIGHT.initial.
   height?: number;
   order: string;
+  attachments?: Attachment[];
   createdAt: number;
   updatedAt: number;
 };

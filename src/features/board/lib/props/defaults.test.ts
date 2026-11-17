@@ -4,8 +4,10 @@ import {
   datesOf,
   isBuiltIn,
   isPast,
+  membersOf,
   tagsOf,
   withDates,
+  withMembers,
   withTags,
 } from "./defaults";
 
@@ -16,6 +18,16 @@ describe("tags", () => {
     expect(tagsOf(props)).toEqual(["bug", "area/ui"]);
     expect(withTags(props, [])).toEqual({ Owner: "Fairy" });
     expect(tagsOf({})).toEqual([]);
+  });
+});
+
+describe("members", () => {
+  it("reads string UIDs and drops the key when empty", () => {
+    const props = withMembers({ tags: ["bug"] }, ["u1", "u2"]);
+    expect(props).toEqual({ tags: ["bug"], members: ["u1", "u2"] });
+    expect(membersOf(props)).toEqual(["u1", "u2"]);
+    expect(withMembers(props, [])).toEqual({ tags: ["bug"] });
+    expect(membersOf({})).toEqual([]);
   });
 });
 

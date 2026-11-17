@@ -1,0 +1,23 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function spaceDoc(spaceId) {
+      return firestore.get(/databases/(default)/documents/spaces/$(spaceId)).data;
+    }
+
+    function isSpaceMember(spaceId) {
+      return request.auth != null && request.auth.uid in spaceDoc(spaceId).memberIds;
+    }
+
+    function canEditSpace(spaceId) {
+      return isSpaceMember(spaceId) && spaceDoc(spaceId).members[request.auth.uid].role in ['owner', 'editor'];
+    }
+
+    match /spaces/{spaceId}/boards/{boardId}/cards/{cardId}/{fileName} {
+      allow read: if isSpaceMember(spaceId);
+      allow create: if canEditSpace(spaceId) && request.resource.size < 10 * 1024 * 1024;
+      allow delete: if canEditSpace(spaceId);
+    }
+  }
+}
