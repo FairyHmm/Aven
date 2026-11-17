@@ -1,0 +1,50 @@
+.glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  color: var(--color-bg-deep);
+  background: var(--state, transparent);
+  border: 1.5px solid var(--state, var(--color-ac));
+  border-radius: 50%;
+}
+
+.glyph[data-state="x"] {
+  --state: var(--color-success);
+}
+.glyph[data-state=">"] {
+  --state: var(--color-incomplete);
+}
+.glyph[data-state="<"] {
+  --state: var(--accent-violet);
+}
+.glyph[data-state="!"] {
+  --state: var(--color-warning);
+}
+.glyph[data-state="-"] {
+  --state: var(--color-fg);
+}
+.glyph[data-state="/"] {
+  --state: var(--color-warning);
+  background: linear-gradient(135deg, var(--state) 50%, transparent 50%);
+}
+.glyph[data-state="?"] {
+  --state: var(--accent-indigo);
+}
+.glyph[data-state="n"] {
+  --state: var(--color-incomplete);
+}
+
+.glyph[data-shape="icon"] {
+  color: var(--state);
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+
+.glyph[data-state="?"] path,
+.glyph[data-state="<"] path:last-child,
+.glyph[data-state=">"] path:last-child {
+  stroke: var(--color-bg-deep);
+}

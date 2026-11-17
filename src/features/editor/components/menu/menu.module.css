@@ -1,0 +1,20 @@
+.tail {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hint {
+  color: var(--mantine-color-dimmed);
+  font-size: 11px;
+}
+
+/* The plain highlight has no circle to show: this is its colour. */
+.dot {
+  display: inline-block;
+  width: 0.8em;
+  height: 0.8em;
+  margin: 0 0.1em;
+  background: var(--color-primary-hover);
+  border-radius: 50%;
+}
