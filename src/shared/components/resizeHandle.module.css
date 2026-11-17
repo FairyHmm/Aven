@@ -1,0 +1,63 @@
+/* A hit area on an edge of its parent (which must be positioned), with a thin
+   line that appears when the pointer is close. */
+.handle {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  outline: none;
+  touch-action: none;
+}
+
+.handle[data-axis="x"] {
+  top: 0;
+  right: -7px;
+  bottom: 0;
+  width: 14px;
+  cursor: col-resize;
+}
+
+/* On the bottom edge itself, inside it so a scrolling list never clips it. */
+.handle[data-axis="y"] {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 10px;
+  cursor: row-resize;
+}
+
+.grip {
+  background: var(--color-primary-hover);
+  border-radius: 999px;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+
+.handle[data-axis="x"] .grip {
+  width: 3px;
+  height: 36px;
+}
+
+.handle[data-axis="y"] .grip {
+  width: 36px;
+  height: 3px;
+}
+
+.handle:hover .grip,
+.handle:focus-visible .grip,
+.handle[data-dragging] .grip {
+  opacity: 0.85;
+}
+
+/* On touch there is no hover: the grip stays faintly visible. */
+@media (hover: none) {
+  .grip {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grip {
+    transition: none;
+  }
+}
