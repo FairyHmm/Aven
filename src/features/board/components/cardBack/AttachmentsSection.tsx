@@ -20,7 +20,8 @@ type Props = {
   progress: number | undefined;
   error: string | undefined;
   onClearError: () => void;
-  onRemove: (attachment: Attachment) => void;
+  // Left out for people who may only read: they can download, not remove.
+  onRemove?: ((attachment: Attachment) => void) | undefined;
 };
 
 export function AttachmentsSection({
@@ -100,17 +101,19 @@ export function AttachmentsSection({
                   >
                     <Download size={14} />
                   </ActionIcon>
-                  <ActionIcon
-                    variant="subtle"
-                    color="red"
-                    size="sm"
-                    aria-label={`Remove ${item.name}`}
-                    onClick={() => {
-                      onRemove(item);
-                    }}
-                  >
-                    <Trash2 size={14} />
-                  </ActionIcon>
+                  {onRemove !== undefined && (
+                    <ActionIcon
+                      variant="subtle"
+                      color="red"
+                      size="sm"
+                      aria-label={`Remove ${item.name}`}
+                      onClick={() => {
+                        onRemove(item);
+                      }}
+                    >
+                      <Trash2 size={14} />
+                    </ActionIcon>
+                  )}
                 </Group>
               </Group>
             </Paper>

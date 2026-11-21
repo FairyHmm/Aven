@@ -1,4 +1,5 @@
 import { SortableItem } from "../../../../shared/components/SortableItem";
+import { useCanEdit } from "../../hooks/useCanEdit";
 import { useIsEditing } from "../../hooks/useCardEditor";
 import { useTagFilter } from "../../hooks/useTags";
 import type { Card } from "../../lib/types";
@@ -16,6 +17,7 @@ type Props = {
 // row under its editor, so dragging inside the text selects it instead of lifting the card.
 export function CardSlot({ card, columnId, index, count }: Props) {
   const editing = useIsEditing(card.id);
+  const canEdit = useCanEdit();
   const { tag } = useTagFilter();
   return (
     <SortableItem
@@ -25,7 +27,7 @@ export function CardSlot({ card, columnId, index, count }: Props) {
       axis="vertical"
       index={index}
       count={count}
-      disabled={editing || tag !== undefined}
+      disabled={editing || tag !== undefined || !canEdit}
     >
       <CardTile card={card} />
     </SortableItem>

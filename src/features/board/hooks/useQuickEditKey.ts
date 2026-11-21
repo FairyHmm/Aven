@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 
 import type { PopupKind } from "../lib/types";
+import { useBoardStore } from "../stores/boardStore";
 import { useEditorStore } from "../stores/editorStore";
 
 // A card the keyboard is on: the tile under the pointer, or the focused one.
@@ -36,6 +37,9 @@ const POPUP_KEYS: Record<string, PopupKind> = {
 export function useQuickEditKey() {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      if (!useBoardStore.getState().canEdit) {
+        return;
+      }
       const plain = !(event.ctrlKey || event.metaKey || event.altKey);
       const { openId, editingId, edit, setPopup } = useEditorStore.getState();
       if (!plain || isTyping(event.target) || openId !== undefined) {

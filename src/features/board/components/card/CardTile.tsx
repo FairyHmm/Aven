@@ -5,6 +5,7 @@ import { ResizeHandle } from "../../../../shared/components/ResizeHandle";
 import { useLiveSize } from "../../../../shared/hooks/useLiveSize";
 import { MarkdownView } from "../../../editor/components/MarkdownView";
 import { useBoardActions } from "../../hooks/useBoardActions";
+import { useCanEdit } from "../../hooks/useCanEdit";
 import {
   useAnyEditing,
   useEditCard,
@@ -54,6 +55,7 @@ function ReadingTile({ card }: { card: Card }) {
   const edit = useEditCard();
   const hover = useHoverCard();
   const { editCard, resizeCard } = useBoardActions();
+  const canEdit = useCanEdit();
   // Another card is being edited and the board is dimmed: nothing to resize.
   const dimmed = useAnyEditing();
   const body = useRef<HTMLDivElement>(null);
@@ -97,28 +99,34 @@ function ReadingTile({ card }: { card: Card }) {
         }
       }}
     >
-      <button
-        type="button"
-        className={classes.quickEdit}
-        aria-label="Edit card"
-        onClick={event => {
-          event.stopPropagation();
-          edit(card.id);
-        }}
-      >
-        <Pencil size={13} />
-      </button>
+      {canEdit && (
+        <button
+          type="button"
+          className={classes.quickEdit}
+          aria-label="Edit card"
+          onClick={event => {
+            event.stopPropagation();
+            edit(card.id);
+          }}
+        >
+          <Pencil size={13} />
+        </button>
+      )}
       <div ref={inner} className={classes.inner}>
         <PropsRow
           props={card.props}
-          onProps={next => {
-            // Change the date from its chip via the calendar popup.
-            editCard(card.id, {
-              title: card.title,
-              body: card.body,
-              props: next,
-            });
-          }}
+          onProps={
+            canEdit
+              ? next => {
+                  // Change the date from its chip via the calendar popup.
+                  editCard(card.id, {
+                    title: card.title,
+                    body: card.body,
+                    props: next,
+                  });
+                }
+              : undefined
+          }
         />
         <span className={classes.title}>{card.title}</span>
         {(card.body !== "" || shown !== undefined) && (
@@ -134,9 +142,13 @@ function ReadingTile({ card }: { card: Card }) {
           >
             <MarkdownView
               body={card.body}
-              onBodyChange={next => {
-                editCard(card.id, { title: card.title, body: next });
-              }}
+              onBodyChange={
+                canEdit
+                  ? next => {
+                      editCard(card.id, { title: card.title, body: next });
+                    }
+                  : undefined
+              }
             />
           </div>
         )}
@@ -155,7 +167,7 @@ function ReadingTile({ card }: { card: Card }) {
           <span>{ago(card.updatedAt)}</span>
         </div>
       </div>
-      {!dimmed && (
+      {canEdit && !dimmed && (
         <ResizeHandle
           axis="y"
           label="Resize card"

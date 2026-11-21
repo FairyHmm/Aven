@@ -23,6 +23,8 @@ import { storage } from "./storage";
 export type BoardActions = {
   load: (ref: BoardRef) => void;
   unload: () => void;
+  // Set from the person's role in the space; until it is, nothing can change.
+  setCanEdit: (canEdit: boolean) => void;
   dismissError: () => void;
   addColumn: (name: string) => void;
   renameColumn: (id: string, name: string) => void;
@@ -51,6 +53,8 @@ type BoardState = BoardData & {
   status: "loading" | "ready";
   pending: number;
   error: string | undefined;
+  // False for viewers: every write is ignored, whatever the screen offers.
+  canEdit: boolean;
   actions: BoardActions;
 };
 
@@ -60,6 +64,9 @@ let writeQueue: Promise<void> = Promise.resolve();
 
 export const useBoardStore = create<BoardState>()((set, get) => {
   const persist = (ref: BoardRef, patch: BoardPatch) => {
+    if (!get().canEdit) {
+      return;
+    }
     set(state => ({ pending: state.pending + 1 }));
     writeQueue = writeQueue
       .then(() => storage.apply(ref, patch))
@@ -72,7 +79,10 @@ export const useBoardStore = create<BoardState>()((set, get) => {
   };
 
   const commit = (build: (data: BoardData) => BoardPatch) => {
-    const { ref, columns, cards } = get();
+    const { ref, columns, cards, canEdit } = get();
+    if (!canEdit) {
+      return;
+    }
     const patch = build({ columns, cards });
     if (ref === undefined || isEmptyPatch(patch)) {
       return;
@@ -101,6 +111,9 @@ export const useBoardStore = create<BoardState>()((set, get) => {
       loadToken += 1;
       stopSubscription?.();
       stopSubscription = undefined;
+    },
+    setCanEdit: canEdit => {
+      set({ canEdit });
     },
     dismissError: () => {
       set({ error: undefined });
@@ -164,6 +177,7 @@ export const useBoardStore = create<BoardState>()((set, get) => {
     status: "loading",
     pending: 0,
     error: undefined,
+    canEdit: false,
     actions,
   };
 });

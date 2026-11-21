@@ -7,6 +7,7 @@ import { useSortableDrop } from "../../../shared/hooks/useSortableDrop";
 import { useSortableList } from "../../../shared/hooks/useSortableList";
 import { useBoard } from "../hooks/useBoard";
 import { useBoardActions } from "../hooks/useBoardActions";
+import { useCanEdit } from "../hooks/useCanEdit";
 import { useQuickEditKey } from "../hooks/useQuickEditKey";
 import { BoardToolbar } from "./BoardToolbar";
 import { CardEditorModal } from "./cardBack/CardEditorModal";
@@ -21,6 +22,7 @@ export function BoardView({ spaceId, boardId, name }: Props) {
   const board = useBoard(spaceId, boardId);
   useQuickEditKey();
   const actions = useBoardActions();
+  const canEdit = useCanEdit();
   const stage = useRef<HTMLDivElement>(null);
   const lane = useRef<HTMLDivElement>(null);
   useAutoScroll(stage);
@@ -83,7 +85,7 @@ export function BoardView({ spaceId, boardId, name }: Props) {
                   count={board.columns.length}
                 />
               ))}
-              <AddColumn />
+              {canEdit && <AddColumn />}
             </>
           )}
         </div>

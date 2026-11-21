@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 
 import { STORAGE_MODE } from "../../../shared/lib/storageMode";
-import { useSpace } from "../../space/hooks/useSpaces";
+import { useCanEditSpace, useSpace } from "../../space/hooks/useSpaces";
 import { sortedColumns } from "../lib/mutations";
 import { useBoardStore } from "../stores/boardStore";
 import { useEditorStore } from "../stores/editorStore";
@@ -13,6 +13,7 @@ import { useTagStore } from "../stores/tagStore";
 // the columns in order, a card count and the load/save status.
 export function useBoard(spaceId: string, boardId: string) {
   const { space } = useSpace(spaceId);
+  const canEdit = useCanEditSpace(spaceId);
   const tagColors = space?.tagColors;
   const fieldConfig = space?.fieldConfig;
 
@@ -22,6 +23,12 @@ export function useBoard(spaceId: string, boardId: string) {
       useFieldStore.getState().hydrate(spaceId, fieldConfig);
     }
   }, [spaceId, space, tagColors, fieldConfig]);
+
+  // Declared before the load effect so the board knows who is looking before
+  // it opens (an empty board is only seeded for someone who may write it).
+  useEffect(() => {
+    useBoardStore.getState().actions.setCanEdit(canEdit);
+  }, [canEdit]);
 
   useEffect(() => {
     useTagStore.getState().load(spaceId);

@@ -6,6 +6,7 @@ import { useAutoScroll } from "../../../../shared/hooks/useAutoScroll";
 import { useLiveSize } from "../../../../shared/hooks/useLiveSize";
 import { useSortableList } from "../../../../shared/hooks/useSortableList";
 import { useBoardActions } from "../../hooks/useBoardActions";
+import { useCanEdit } from "../../hooks/useCanEdit";
 import { useAnyEditing } from "../../hooks/useCardEditor";
 import { useColumnCards } from "../../hooks/useColumnCards";
 import { COLUMN_WIDTH, type Column } from "../../lib/types";
@@ -25,6 +26,7 @@ type Props = {
 
 export function ColumnView({ column, index, count }: Props) {
   const actions = useBoardActions();
+  const canEdit = useCanEdit();
   const cards = useColumnCards(column.id);
   const section = useRef<HTMLElement>(null);
   const list = useRef<HTMLDivElement>(null);
@@ -57,7 +59,7 @@ export function ColumnView({ column, index, count }: Props) {
       index={index}
       count={count}
       handle="[data-drag-handle]"
-      disabled={renaming}
+      disabled={renaming || !canEdit}
       className={classes.slot}
       delay={index * 60}
       enterOnLoad
@@ -76,7 +78,9 @@ export function ColumnView({ column, index, count }: Props) {
             value={column.name}
             editing={renaming}
             onStart={() => {
-              setRenaming(true);
+              if (canEdit) {
+                setRenaming(true);
+              }
             }}
             onDone={next => {
               setRenaming(false);
@@ -86,16 +90,18 @@ export function ColumnView({ column, index, count }: Props) {
             }}
           />
           <span className={classes.count}>{cards.length}</span>
-          <ColumnMenu
-            accent={column.accent}
-            onRename={() => {
-              setRenaming(true);
-            }}
-            onAccent={accent => {
-              actions.recolorColumn(column.id, accent);
-            }}
-            onDelete={remove}
-          />
+          {canEdit && (
+            <ColumnMenu
+              accent={column.accent}
+              onRename={() => {
+                setRenaming(true);
+              }}
+              onAccent={accent => {
+                actions.recolorColumn(column.id, accent);
+              }}
+              onDelete={remove}
+            />
+          )}
         </header>
 
         <div ref={list} className={classes.list}>
@@ -113,16 +119,18 @@ export function ColumnView({ column, index, count }: Props) {
               className={classes.empty}
               style={emptySize > 0 ? { minHeight: emptySize } : undefined}
             >
-              Drop a card here
+              {canEdit ? "Drop a card here" : "No cards"}
             </div>
           )}
         </div>
 
-        <footer className={classes.footer}>
-          <CardComposer columnId={column.id} />
-        </footer>
+        {canEdit && (
+          <footer className={classes.footer}>
+            <CardComposer columnId={column.id} />
+          </footer>
+        )}
 
-        {!editing && (
+        {canEdit && !editing && (
           <ResizeHandle
             axis="x"
             label={`Resize ${column.name}`}

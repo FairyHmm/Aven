@@ -3,7 +3,6 @@ import { Trash2 } from "lucide-react";
 import { useRef, useState } from "react";
 
 import { glideAround } from "../../../../shared/lib/dnd/glide";
-import { ms } from "../../../../shared/lib/motion";
 import { CodeEditor } from "../../../editor/components/CodeEditor";
 import { useAttachments } from "../../hooks/useAttachments";
 import { useBoardActions } from "../../hooks/useBoardActions";
@@ -14,6 +13,7 @@ import { ActionButton } from "../actions/ActionButton";
 import { AttachmentsSection } from "./AttachmentsSection";
 import { CardSections } from "./CardSections";
 import { ListMenu } from "./ListMenu";
+import { MODAL_TRANSITION } from "./modalTransition";
 import { PropButtons } from "./PropButtons";
 
 import classes from "./cardModal.module.css";
@@ -23,18 +23,6 @@ type Popup = { kind: PopupKind; from: "buttons" | "sections" };
 
 const from = (popup: Popup | undefined, part: Popup["from"]) =>
   popup?.from === part ? popup.kind : undefined;
-
-const MODAL_TRANSITION = {
-  transition: {
-    in: { opacity: 1, transform: "translateY(0) scale(1)" },
-    out: { opacity: 0, transform: "translateY(10px) scale(0.94)" },
-    common: { transformOrigin: "center 40%" },
-    transitionProperty: "transform, opacity",
-  },
-  duration: ms("slow"),
-  exitDuration: ms("base"),
-  timingFunction: "var(--spring)",
-};
 
 export function CardBack({ card, onClose }: Props) {
   const { editCard, removeCard } = useBoardActions();

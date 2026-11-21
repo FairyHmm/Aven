@@ -19,8 +19,8 @@ export function PropsRow({
   inert?: boolean;
   animate?: boolean;
   scope?: string;
-  onDates?: () => void;
-  onProps?: (props: Props) => void;
+  onDates?: (() => void) | undefined;
+  onProps?: ((props: Props) => void) | undefined;
 }) {
   const live = useLive();
   const tags = tagsOf(props);

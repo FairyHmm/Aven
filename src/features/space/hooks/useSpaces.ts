@@ -53,6 +53,18 @@ export function useBoards(spaceId: string) {
   return { boards, loading: status !== "ready" };
 }
 
+// Whether the signed-in user may change things in a space: owners and editors
+// can, viewers (and anyone not in it) can't.
+export function useCanEditSpace(spaceId: string): boolean {
+  const { user } = useAuth();
+  const { space } = useSpace(spaceId);
+  const role =
+    user === null || space === undefined
+      ? undefined
+      : space.members[user.uid]?.role;
+  return role === "owner" || role === "editor";
+}
+
 export function useSpaceMembers(spaceId: string | undefined): SpaceMember[] {
   const { space } = useSpace(spaceId);
   return useMemo(() => {

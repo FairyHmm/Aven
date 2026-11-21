@@ -7,8 +7,13 @@ export function useOpenCard() {
   return useEditorStore(state => state.open);
 }
 
+const noEdit = () => undefined;
+
+// Editing a card in place is only offered to people who may change the board.
 export function useEditCard() {
-  return useEditorStore(state => state.edit);
+  const edit = useEditorStore(state => state.edit);
+  const canEdit = useBoardStore(state => state.canEdit);
+  return canEdit ? edit : noEdit;
 }
 
 export function useHoverCard() {
