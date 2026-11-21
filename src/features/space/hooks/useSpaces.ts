@@ -77,15 +77,19 @@ export function useSpaceActions() {
   const dismissError = useSpaceStore(s => s.dismissError);
 
   return {
-    createSpace: (name: string) =>
+    createSpace: (name: string, boards?: { id: string; name: string }[]) =>
       user === null
         ? Promise.resolve(undefined)
-        : useSpaceStore.getState().createSpace(name, {
-            uid: user.uid,
-            email: user.email ?? "",
-            displayName: user.displayName ?? "User",
-            photoURL: user.photoURL,
-          }),
+        : useSpaceStore.getState().createSpace(
+            name,
+            {
+              uid: user.uid,
+              email: user.email ?? "",
+              displayName: user.displayName ?? "User",
+              photoURL: user.photoURL,
+            },
+            boards,
+          ),
     renameSpace,
     deleteSpace,
     createBoard,

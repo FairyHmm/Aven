@@ -1,4 +1,5 @@
 import { newId } from "../../../../shared/lib/id";
+import { findAccountByEmail } from "../../../../shared/lib/localUsers";
 import type { Board, Space } from "../../lib/types";
 import {
   boardsKey,
@@ -8,6 +9,7 @@ import {
   SPACES_KEY,
   writeJson,
 } from "./localSeed";
+import { startingBoards } from "./startingBoards";
 import type { SpaceStorage } from "./types";
 
 const spaceListeners = new Set<() => void>();
@@ -55,7 +57,7 @@ export const localSpaceStorage: SpaceStorage = {
       set.delete(push);
     };
   },
-  createSpace: async (name, owner) => {
+  createSpace: async (name, owner, boards) => {
     const now = Date.now();
     const id = newId();
     const space: Space = {
@@ -68,16 +70,15 @@ export const localSpaceStorage: SpaceStorage = {
       updatedAt: now,
     };
     writeJson(SPACES_KEY, [...(readAllSpaces() ?? []), space]);
-    writeJson(boardsKey(id), [
-      {
-        id: newId(),
+    writeJson(
+      boardsKey(id),
+      startingBoards(boards).map((board): Board => ({
+        ...board,
         spaceId: id,
-        name: "Board 1",
-        order: "a0",
         createdAt: now,
         updatedAt: now,
-      },
-    ] satisfies Board[]);
+      })),
+    );
     notifySpaces();
     return space;
   },
@@ -135,13 +136,15 @@ export const localSpaceStorage: SpaceStorage = {
     notifyBoards(spaceId);
   },
   findUserByEmail: async email => {
-    const clean = email.trim().toLowerCase();
-    if (clean === "") return undefined;
+    // Only accounts that were actually created can be found, like Firebase's
+    // `users` collection.
+    const account = findAccountByEmail(email);
+    if (account === undefined) return undefined;
     return {
-      uid: `local:${clean}`,
-      email: clean,
-      displayName: clean.split("@")[0] ?? clean,
-      photoURL: null,
+      uid: account.uid,
+      email: account.email,
+      displayName: account.displayName,
+      photoURL: account.photoURL,
     };
   },
   addMember: async (spaceId, member) => {

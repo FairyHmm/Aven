@@ -19,6 +19,7 @@ import {
   watchUserSpaces,
 } from "./spaceSync";
 import { spaceStorage } from "./storage";
+import type { NewBoard } from "./storage/types";
 
 type SpaceState = {
   uid: string | undefined;
@@ -31,7 +32,11 @@ type SpaceState = {
   watchBoards: (spaceId: string) => void;
   unwatchBoards: (spaceId: string) => void;
   dismissError: () => void;
-  createSpace: (name: string, owner: UserLookup) => Promise<Space | undefined>;
+  createSpace: (
+    name: string,
+    owner: UserLookup,
+    boards?: NewBoard[],
+  ) => Promise<Space | undefined>;
   renameSpace: (spaceId: string, name: string) => Promise<void>;
   deleteSpace: (spaceId: string) => Promise<void>;
   createBoard: (spaceId: string, name: string) => Promise<Board | undefined>;
@@ -129,9 +134,9 @@ export const useSpaceStore = create<SpaceState>()((set, get) => {
       set({ error: undefined });
     },
 
-    createSpace: async (name, owner) => {
+    createSpace: async (name, owner, boards) => {
       try {
-        return await spaceStorage.createSpace(name, owner);
+        return await spaceStorage.createSpace(name, owner, boards);
       } catch (error: unknown) {
         set({ error: errMessage(error) });
         return undefined;

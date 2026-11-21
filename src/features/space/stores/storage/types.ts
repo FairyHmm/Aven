@@ -8,6 +8,9 @@ import type {
   UserLookup,
 } from "../../lib/types";
 
+// A board a new space starts with; the caller may choose its id and name.
+export type NewBoard = { id: string; name: string };
+
 export type SpaceStorage = {
   subscribeSpaces: (
     uid: string,
@@ -19,7 +22,11 @@ export type SpaceStorage = {
     onData: (boards: Board[]) => void,
     onError: (error: Error) => void,
   ) => () => void;
-  createSpace: (name: string, owner: UserLookup) => Promise<Space>;
+  createSpace: (
+    name: string,
+    owner: UserLookup,
+    boards?: NewBoard[],
+  ) => Promise<Space>;
   renameSpace: (spaceId: string, name: string) => Promise<void>;
   deleteSpace: (spaceId: string) => Promise<void>;
   createBoard: (spaceId: string, name: string, order: string) => Promise<Board>;

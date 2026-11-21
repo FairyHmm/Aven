@@ -8,23 +8,27 @@ import {
   googleSignIn,
   subscribeAuth,
 } from "../lib/firebaseAuth";
+import {
+  GUEST_USER,
+  SESSION_KEY,
+  localSignIn,
+  localSignInGuest,
+  localSignOut,
+  localSignUp,
+  readLocalSession,
+} from "../lib/localAuth";
 import type { AuthStatus, AuthUser } from "../lib/types";
-
-const LOCAL_OUT_KEY = "aven:local-signed-out";
-
-export const LOCAL_USER: AuthUser = {
-  uid: "local-user",
-  email: "local@aven.app",
-  displayName: "Local User",
-  photoURL: null,
-};
 
 type AuthState = {
   status: AuthStatus;
   user: AuthUser | null;
   error: string | undefined;
   busy: boolean;
+  // Set when an account was just created (or a trial started), so the app can
+  // give it the guide space once; cleared by whoever acts on it.
+  welcomeUid: string | null;
   clearError: () => void;
+  clearWelcome: () => void;
   signInWithEmail: (email: string, password: string) => Promise<boolean>;
   signUpWithEmail: (
     displayName: string,
@@ -32,12 +36,15 @@ type AuthState = {
     password: string,
   ) => Promise<boolean>;
   signInWithGoogle: () => Promise<boolean>;
-  signInLocal: (name?: string) => void;
+  signInGuest: () => void;
   signOut: () => Promise<void>;
 };
 
 function describeAuthError(error: unknown): string {
   const message = error instanceof Error ? error.message : String(error);
+  if (/invalid-email/i.test(message)) {
+    return "Enter a valid email address.";
+  }
   if (/invalid-credential|wrong-password|user-not-found/i.test(message)) {
     return "Invalid email or password.";
   }
@@ -53,32 +60,21 @@ function describeAuthError(error: unknown): string {
   return message;
 }
 
-function isLocalSignedOut(): boolean {
-  try {
-    return sessionStorage.getItem(LOCAL_OUT_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
-function setLocalSignedOut(out: boolean): void {
-  try {
-    if (out) {
-      sessionStorage.setItem(LOCAL_OUT_KEY, "1");
-    } else {
-      sessionStorage.removeItem(LOCAL_OUT_KEY);
-    }
-  } catch {
-    // Ignore storage errors in restricted environments.
-  }
-}
+const isLocal = STORAGE_MODE === "local";
 
 export const useAuthStore = create<AuthState>()(set => {
-  const run = async (task: () => Promise<AuthUser>): Promise<boolean> => {
+  const run = async (
+    task: () => Promise<{ user: AuthUser; isNew: boolean }>,
+  ): Promise<boolean> => {
     set({ busy: true, error: undefined });
     try {
-      const user = await task();
-      set({ user, status: "authenticated", busy: false });
+      const { user, isNew } = await task();
+      set({
+        user,
+        status: "authenticated",
+        busy: false,
+        welcomeUid: isNew ? user.uid : null,
+      });
       return true;
     } catch (error: unknown) {
       set({ error: describeAuthError(error), busy: false });
@@ -91,29 +87,40 @@ export const useAuthStore = create<AuthState>()(set => {
     user: null,
     error: undefined,
     busy: false,
+    welcomeUid: null,
     clearError: () => {
       set({ error: undefined });
     },
+    clearWelcome: () => {
+      set({ welcomeUid: null });
+    },
     signInWithEmail: (email, password) =>
-      run(() => emailSignIn(email, password)),
+      run(async () => ({
+        user: await (isLocal
+          ? localSignIn(email, password)
+          : emailSignIn(email, password)),
+        isNew: false,
+      })),
     signUpWithEmail: (displayName, email, password) =>
-      run(() => emailSignUp(displayName, email, password)),
+      run(async () => ({
+        user: await (isLocal
+          ? localSignUp(displayName, email, password)
+          : emailSignUp(displayName, email, password)),
+        isNew: true,
+      })),
     signInWithGoogle: () => run(() => googleSignIn()),
-    signInLocal: name => {
-      setLocalSignedOut(false);
-      const trimmed = name?.trim();
+    signInGuest: () => {
+      localSignInGuest();
       set({
+        user: GUEST_USER,
         status: "authenticated",
-        user:
-          trimmed !== undefined && trimmed !== ""
-            ? { ...LOCAL_USER, displayName: trimmed }
-            : LOCAL_USER,
         error: undefined,
+        welcomeUid: GUEST_USER.uid,
       });
     },
     signOut: async () => {
-      if (STORAGE_MODE === "local") {
-        setLocalSignedOut(true);
+      if (isLocal) {
+        localSignOut();
         set({ status: "unauthenticated", user: null, error: undefined });
         return;
       }
@@ -134,12 +141,20 @@ export function initAuth(): Promise<AuthUser | null> {
   if (readyPromise !== undefined) {
     return readyPromise;
   }
-  if (STORAGE_MODE === "local") {
-    const signedOut = isLocalSignedOut();
-    const user = signedOut ? null : LOCAL_USER;
-    useAuthStore.setState({
-      status: signedOut ? "unauthenticated" : "authenticated",
-      user,
+  if (isLocal) {
+    const apply = (user: AuthUser | null) => {
+      useAuthStore.setState({
+        status: user === null ? "unauthenticated" : "authenticated",
+        user,
+      });
+    };
+    const user = readLocalSession();
+    apply(user);
+    // Like Firebase, a sign-in or sign-out in another tab is picked up here.
+    window.addEventListener("storage", event => {
+      if (event.key === SESSION_KEY || event.key === null) {
+        apply(readLocalSession());
+      }
     });
     readyPromise = Promise.resolve(user);
     return readyPromise;

@@ -2,6 +2,7 @@ import { AppShell, Text } from "@mantine/core";
 import { Outlet, createRootRoute } from "@tanstack/react-router";
 
 import { AppHeader } from "../app/AppHeader";
+import { WelcomeGate } from "../features/welcome/components/WelcomeGate";
 
 export const Route = createRootRoute({
   component: RootLayout,
@@ -17,6 +18,7 @@ function RootLayout() {
       <AppShell.Main>
         <Outlet />
       </AppShell.Main>
+      <WelcomeGate />
     </AppShell>
   );
 }

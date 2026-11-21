@@ -9,6 +9,7 @@ import {
   updateSpaceMemberRole,
 } from "./firebaseMembers";
 import { toBoard, toSpace } from "./parse";
+import { startingBoards } from "./startingBoards";
 import type { SpaceStorage } from "./types";
 
 export const firebaseSpaceStorage: SpaceStorage = {
@@ -74,7 +75,7 @@ export const firebaseSpaceStorage: SpaceStorage = {
     };
   },
 
-  createSpace: async (name, owner) => {
+  createSpace: async (name, owner, boards) => {
     const { db, fs } = await spaceSdk();
     const now = Date.now();
     const id = newId();
@@ -87,15 +88,18 @@ export const firebaseSpaceStorage: SpaceStorage = {
       createdAt: now,
       updatedAt: now,
     };
-    const boardId = newId();
+    // The board rules look the space up with get(), which can't see a space
+    // written in the same batch, so the space goes first and its boards after.
+    await fs.setDoc(fs.doc(db, "spaces", id), space);
     const batch = fs.writeBatch(db);
-    batch.set(fs.doc(db, "spaces", id), space);
-    batch.set(fs.doc(db, "spaces", id, "boards", boardId), {
-      name: "Board 1",
-      order: "a0",
-      createdAt: now,
-      updatedAt: now,
-    });
+    for (const board of startingBoards(boards)) {
+      batch.set(fs.doc(db, "spaces", id, "boards", board.id), {
+        name: board.name,
+        order: board.order,
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
     await batch.commit();
     return space;
   },

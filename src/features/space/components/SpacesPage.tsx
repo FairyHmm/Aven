@@ -10,7 +10,7 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { MoreVertical, Pencil, Plus, Trash2, Users } from "lucide-react";
 import { useState } from "react";
 
@@ -25,6 +25,7 @@ export function SpacesPage() {
   const { createSpace, renameSpace, deleteSpace, dismissError } =
     useSpaceActions();
 
+  const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<Space>();
   const [deleting, setDeleting] = useState<Space>();
@@ -145,7 +146,14 @@ export function SpacesPage() {
             setCreating(false);
           }}
           onSubmit={async name => {
-            await createSpace(name);
+            const space = await createSpace(name);
+            if (space !== undefined) {
+              // A space opens on its first board.
+              await navigate({
+                to: "/s/$spaceId",
+                params: { spaceId: space.id },
+              });
+            }
           }}
         />
       )}

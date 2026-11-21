@@ -1,19 +1,20 @@
 import {
   Alert,
+  Anchor,
   Button,
   Center,
+  Collapse,
   Divider,
   Paper,
   PasswordInput,
-  SegmentedControl,
   Stack,
-  Text,
   TextInput,
+  Text,
   Title,
 } from "@mantine/core";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { LogIn, TriangleAlert, UserPlus } from "lucide-react";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useRef, useState } from "react";
 
 import { STORAGE_MODE } from "../../../shared/lib/storageMode";
 import { useAuth } from "../hooks/useAuth";
@@ -32,7 +33,7 @@ export function LoginPage() {
     signInWithEmail,
     signUpWithEmail,
     signInWithGoogle,
-    signInLocal,
+    signInGuest,
   } = useAuth();
 
   const [mode, setMode] = useState<AuthMode>("signin");
@@ -40,17 +41,22 @@ export function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const lastError = useRef(error);
+  if (error !== undefined) {
+    lastError.current = error;
+  }
+
+  const switchMode = () => {
+    clearError();
+    setMode(mode === "signin" ? "signup" : "signin");
+  };
+
   const finish = () => {
     void navigate({ to: destination, replace: true });
   };
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    if (STORAGE_MODE === "local") {
-      signInLocal(mode === "signup" ? name : email.split("@")[0]);
-      finish();
-      return;
-    }
     const ok =
       mode === "signin"
         ? await signInWithEmail(email.trim(), password)
@@ -75,27 +81,9 @@ export function LoginPage() {
             <Title order={3}>
               {mode === "signin" ? "Sign in to Aven" : "Create your account"}
             </Title>
-            <Text size="sm" c="dimmed">
-              {STORAGE_MODE === "local"
-                ? "Running in local mode — data is stored in this browser."
-                : "Sign in to sync spaces, boards, and members."}
-            </Text>
           </div>
 
-          <SegmentedControl
-            fullWidth
-            value={mode}
-            onChange={value => {
-              clearError();
-              setMode(value === "signup" ? "signup" : "signin");
-            }}
-            data={[
-              { label: "Sign in", value: "signin" },
-              { label: "Sign up", value: "signup" },
-            ]}
-          />
-
-          {error !== undefined && (
+          <Collapse expanded={error !== undefined}>
             <Alert
               color="red"
               variant="light"
@@ -103,28 +91,27 @@ export function LoginPage() {
               withCloseButton
               onClose={clearError}
             >
-              {error}
+              {lastError.current}
             </Alert>
-          )}
+          </Collapse>
 
-          <form onSubmit={event => void handleSubmit(event)}>
+          <form noValidate onSubmit={event => void handleSubmit(event)}>
             <Stack gap="sm">
-              {mode === "signup" && (
+              <Collapse expanded={mode === "signup"}>
                 <TextInput
                   label="Display name"
                   placeholder="Your name"
-                  required
                   value={name}
                   onChange={event => {
                     setName(event.currentTarget.value);
                   }}
                 />
-              )}
+              </Collapse>
               <TextInput
                 label="Email"
                 type="email"
                 placeholder="you@example.com"
-                required={STORAGE_MODE === "firebase"}
+                required
                 value={email}
                 onChange={event => {
                   setEmail(event.currentTarget.value);
@@ -133,8 +120,7 @@ export function LoginPage() {
               <PasswordInput
                 label="Password"
                 placeholder="Your password"
-                required={STORAGE_MODE === "firebase"}
-                minLength={STORAGE_MODE === "firebase" ? 6 : undefined}
+                required
                 value={password}
                 onChange={event => {
                   setPassword(event.currentTarget.value);
@@ -157,7 +143,7 @@ export function LoginPage() {
             </Stack>
           </form>
 
-          {STORAGE_MODE === "firebase" ? (
+          {STORAGE_MODE === "firebase" && (
             <>
               <Divider label="or" labelPosition="center" />
               <Button
@@ -169,18 +155,37 @@ export function LoginPage() {
                 Continue with Google
               </Button>
             </>
-          ) : (
-            <Button
-              variant="subtle"
-              fullWidth
-              onClick={() => {
-                signInLocal();
-                finish();
-              }}
-            >
-              Continue as Local User
-            </Button>
           )}
+
+          <Stack gap={6} align="center">
+            <Text size="sm" c="dimmed">
+              {mode === "signin"
+                ? "New to Aven? "
+                : "Already have an account? "}
+              <Anchor
+                component="button"
+                type="button"
+                size="sm"
+                onClick={switchMode}
+              >
+                {mode === "signin" ? "Create an account" : "Sign in"}
+              </Anchor>
+            </Text>
+            {STORAGE_MODE === "local" && (
+              <Anchor
+                component="button"
+                type="button"
+                size="sm"
+                c="dimmed"
+                onClick={() => {
+                  signInGuest();
+                  finish();
+                }}
+              >
+                Try without an account
+              </Anchor>
+            )}
+          </Stack>
         </Stack>
       </Paper>
     </Center>

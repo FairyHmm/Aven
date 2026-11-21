@@ -90,13 +90,19 @@ export async function emailSignUp(
   return mapped;
 }
 
-export async function googleSignIn(): Promise<AuthUser> {
+export async function googleSignIn(): Promise<{
+  user: AuthUser;
+  isNew: boolean;
+}> {
   const { auth, fbAuth } = await sdk();
   const provider = new fbAuth.GoogleAuthProvider();
   const cred = await fbAuth.signInWithPopup(auth, provider);
   const mapped = toAuthUser(cred.user);
   await syncUserProfile(mapped);
-  return mapped;
+  return {
+    user: mapped,
+    isNew: fbAuth.getAdditionalUserInfo(cred)?.isNewUser === true,
+  };
 }
 
 export async function firebaseSignOut(): Promise<void> {
