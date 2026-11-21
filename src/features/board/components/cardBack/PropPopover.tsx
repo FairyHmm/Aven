@@ -8,7 +8,7 @@ import {
   withTags,
 } from "../../lib/props/defaults";
 import type { PropertyPopup, Props } from "../../lib/types";
-import { DatesPicker } from "../pickers/DatesPicker";
+import { DatesPicker } from "../pickers/DatesPickerLazy";
 import { LabelsPicker } from "../pickers/LabelsPicker";
 import { MembersPicker } from "../pickers/MembersPicker";
 import { MARK } from "../pickers/popoverFit";

@@ -3,7 +3,7 @@ import { Trash2 } from "lucide-react";
 import { useRef, useState } from "react";
 
 import { glideAround } from "../../../../shared/lib/dnd/glide";
-import { CodeEditor } from "../../../editor/components/CodeEditor";
+import { CodeEditor } from "../../../editor/components/CodeEditorLazy";
 import { useAttachments } from "../../hooks/useAttachments";
 import { useBoardActions } from "../../hooks/useBoardActions";
 import { useModalLeave } from "../../hooks/useModalLeave";

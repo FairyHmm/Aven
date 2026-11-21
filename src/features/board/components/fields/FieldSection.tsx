@@ -4,7 +4,7 @@ import { useState } from "react";
 import { inferValue } from "../../lib/props/convert";
 import { type FieldType, typeOf } from "../../lib/props/fields";
 import type { PropValue, Props } from "../../lib/types";
-import { FieldControl } from "./FieldControl";
+import { FieldControl } from "./FieldControlLazy";
 import { RenameInput } from "./RenameInput";
 import { TypeMenu } from "./TypeMenu";
 

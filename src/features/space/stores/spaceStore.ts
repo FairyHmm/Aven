@@ -122,10 +122,14 @@ export const useSpaceStore = create<SpaceState>()((set, get) => {
           }));
         },
       );
+      // The local adapter pushes boards synchronously while subscribing, so the
+      // status can already be "ready" here; only mark loading if it isn't.
       if (started) {
-        set(s => ({
-          boardsStatus: { ...s.boardsStatus, [spaceId]: "loading" },
-        }));
+        set(s =>
+          s.boardsStatus[spaceId] === "ready"
+            ? s
+            : { boardsStatus: { ...s.boardsStatus, [spaceId]: "loading" } },
+        );
       }
     },
 

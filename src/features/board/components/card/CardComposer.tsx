@@ -2,7 +2,7 @@ import { Button } from "@mantine/core";
 import { Plus } from "lucide-react";
 import { useRef, useState } from "react";
 
-import { CodeEditor } from "../../../editor/components/CodeEditor";
+import { CodeEditor } from "../../../editor/components/CodeEditorLazy";
 import { useBoardActions } from "../../hooks/useBoardActions";
 
 import classes from "../column/columnComposer.module.css";

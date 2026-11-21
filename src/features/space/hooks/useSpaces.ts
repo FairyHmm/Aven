@@ -65,6 +65,17 @@ export function useCanEditSpace(spaceId: string): boolean {
   return role === "owner" || role === "editor";
 }
 
+// Starts loading a space's boards a little before the space opens (a link was
+// hovered or just clicked), and lets go after a few seconds, by which time the
+// page has taken its own hold.
+export function warmSpace(spaceId: string): void {
+  const store = useSpaceStore.getState();
+  store.watchBoards(spaceId);
+  setTimeout(() => {
+    store.unwatchBoards(spaceId);
+  }, 10_000);
+}
+
 export function useSpaceMembers(spaceId: string | undefined): SpaceMember[] {
   const { space } = useSpace(spaceId);
   return useMemo(() => {

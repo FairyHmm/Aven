@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 
 import { glideAround } from "../../../../shared/lib/dnd/glide";
-import { CodeEditor } from "../../../editor/components/CodeEditor";
+import { CodeEditor } from "../../../editor/components/CodeEditorLazy";
 import { useBoardActions } from "../../hooks/useBoardActions";
 import { useCloseCard } from "../../hooks/useCardEditor";
 import { joinCard, splitCard } from "../../lib/text";

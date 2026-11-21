@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from "react";
 
 import { STORAGE_MODE } from "../../../shared/lib/storageMode";
+import { preloadCodeEditor } from "../../editor/components/CodeEditorLazy";
 import { useCanEditSpace, useSpace } from "../../space/hooks/useSpaces";
 import { sortedColumns } from "../lib/mutations";
 import { useBoardStore } from "../stores/boardStore";
@@ -46,6 +47,14 @@ export function useBoard(spaceId: string, boardId: string) {
   const status = useBoardStore(state => state.status);
   const pending = useBoardStore(state => state.pending);
   const error = useBoardStore(state => state.error);
+
+  // Someone who can edit will want the editor: fetch it as soon as the board
+  // has shown, so nothing else waits on it and it is there for the first edit.
+  useEffect(() => {
+    if (canEdit && status === "ready") {
+      void preloadCodeEditor();
+    }
+  }, [canEdit, status]);
 
   const sorted = useMemo(() => sortedColumns({ columns }), [columns]);
 
