@@ -38,6 +38,17 @@ type Menu = {
   onProps: (props: Props) => void;
 };
 
+// Under the tile if the menu fits there, else over it, else against the
+// bottom of the screen.
+function stackedTop(rect: DOMRect, height: number): number {
+  const under = rect.bottom + GAP;
+  if (under + height + GAP <= window.innerHeight) {
+    return under;
+  }
+  const over = rect.top - GAP - height;
+  return over >= GAP ? over : Math.max(GAP, window.innerHeight - height - GAP);
+}
+
 // Quick-edit menu shown beside the card tile while editing in place.
 export function QuickMenu({ card, anchor, finish, props, onProps }: Menu) {
   const rect = useAnchorRect(anchor);
@@ -55,17 +66,23 @@ export function QuickMenu({ card, anchor, finish, props, onProps }: Menu) {
   if (rect === undefined) {
     return null;
   }
-  // Beside the tile on the right, or on its left near the screen edge.
+  // Beside the tile on the right, or on its left near the screen edge. On a
+  // narrow screen there is room on neither side without covering the tile (and
+  // the text being edited), so the menu goes under it, or over it, across the
+  // width of the screen.
   const flipped = rect.right + GAP + WIDTH > window.innerWidth - GAP;
-  const left = flipped
-    ? Math.max(GAP, rect.left - GAP - WIDTH)
-    : rect.right + GAP;
+  const below = flipped && rect.left - GAP - WIDTH < GAP;
+  const side = below ? "below" : flipped ? "left" : "right";
+  const left = below
+    ? GAP
+    : flipped
+      ? Math.max(GAP, rect.left - GAP - WIDTH)
+      : rect.right + GAP;
 
-  // Level with the tile, but never below the bottom of the screen.
-  const top = Math.max(
-    GAP,
-    Math.min(rect.top, window.innerHeight - height - GAP),
-  );
+  const top = below
+    ? stackedTop(rect, height)
+    : // Level with the tile, but never below the bottom of the screen.
+      Math.max(GAP, Math.min(rect.top, window.innerHeight - height - GAP));
 
   const move = (columnId: string) => {
     const count = cardsOf(useBoardStore.getState(), columnId).length;
@@ -88,8 +105,12 @@ export function QuickMenu({ card, anchor, finish, props, onProps }: Menu) {
         ref={menu}
         className={classes.menu}
         // The actions slide out from the tile, so which side it is on matters.
-        data-side={flipped ? "left" : "right"}
-        style={{ left, top, width: WIDTH }}
+        data-side={side}
+        style={{
+          left,
+          top,
+          width: below ? window.innerWidth - 2 * GAP : WIDTH,
+        }}
         // Part of the tile as far as ending the edit is concerned; a press here
         // must not take focus away from the text either.
         data-keep-editing=""

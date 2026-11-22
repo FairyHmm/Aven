@@ -14,6 +14,7 @@ import {
   useOpenCard,
 } from "../../hooks/useCardEditor";
 import { useClamped } from "../../hooks/useClamped";
+import { useContextEdit } from "../../hooks/useContextEdit";
 import { useGrow } from "../../hooks/useGrow";
 import { cardKind } from "../../lib/kind";
 import { tracksProgress } from "../../lib/props/defaults";
@@ -25,8 +26,9 @@ import { PropsRow } from "./PropsRow";
 
 import classes from "./card.module.css";
 
-// A click opens the card in the modal. The pencil (or `e` while the pointer
-// is on the tile) turns the tile itself into the editor.
+// A click opens the card in the modal. The pencil, `e` while the pointer is on
+// the tile, or a right-click (a long press on a phone) turns the tile itself
+// into the editor.
 export function CardTile({ card }: { card: Card }) {
   return useIsEditing(card.id) ? (
     <EditingTile card={card} />
@@ -54,6 +56,7 @@ function ReadingTile({ card }: { card: Card }) {
   const open = useOpenCard();
   const edit = useEditCard();
   const hover = useHoverCard();
+  const contextEdit = useContextEdit(card.id);
   const { editCard, resizeCard } = useBoardActions();
   const canEdit = useCanEdit();
   // Another card is being edited and the board is dimmed: nothing to resize.
@@ -92,6 +95,7 @@ function ReadingTile({ card }: { card: Card }) {
       onClick={() => {
         open(card.id);
       }}
+      onContextMenu={contextEdit}
       onKeyDown={event => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();

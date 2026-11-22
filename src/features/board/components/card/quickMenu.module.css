@@ -35,11 +35,27 @@
   --origin: right center;
 }
 
+/* No room at the sides (a phone): the actions come out of the tile's edge as
+   two columns, the first of them (Save) across both. */
+.menu[data-side="below"] {
+  --slide: 0;
+  --origin: center top;
+}
+
 /* The buttons of the menu's current view (see ViewFade). */
 .view {
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.menu[data-side="below"] .view {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.menu[data-side="below"] .view > :first-child {
+  grid-column: 1 / -1;
 }
 
 /* The actions come out of the tile one after another, each on a spring that

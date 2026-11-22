@@ -11,6 +11,8 @@
   flex-direction: column;
   gap: 8px;
   max-height: calc(100dvh - 200px);
+  /* On a phone a column never outgrows the screen: the next one peeks in. */
+  max-width: calc(100vw - 48px);
   padding: 8px;
   background: var(--color-bg-card);
   border: 1px solid transparent;

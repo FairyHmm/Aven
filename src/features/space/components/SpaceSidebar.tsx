@@ -88,7 +88,7 @@ export function SpaceSidebar({ space }: { space: Space }) {
   };
 
   return (
-    <Stack w={200} gap="xs">
+    <Stack w={{ base: "100%", sm: 200 }} gap="xs">
       <Group justify="space-between" px="xs">
         <Text size="xs" fw={700} tt="uppercase" c="dimmed">
           Boards

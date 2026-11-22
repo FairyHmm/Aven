@@ -106,6 +106,18 @@
   opacity: 1;
 }
 
+/* On touch there is no hover to reveal it. A long press on the tile opens the
+   quick edit, so it must not start selecting the text first. */
+@media (hover: none) {
+  .quickEdit {
+    opacity: 1;
+  }
+
+  .card:not([data-editing]) {
+    user-select: none;
+  }
+}
+
 .title {
   font-size: 0.875rem;
   font-weight: 500;

@@ -1,7 +1,8 @@
 .toolbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: 12px;
+  gap: 4px 12px;
 }
 
 .title {
@@ -15,6 +16,7 @@
 .meta {
   margin: 0;
   font-size: 0.8rem;
+  white-space: nowrap;
   color: var(--color-ac);
   font-variant-numeric: tabular-nums;
 }
