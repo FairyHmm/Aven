@@ -13,6 +13,7 @@ import { House, LogOut, PanelLeft } from "lucide-react";
 import { useAuth } from "../features/auth/hooks/useAuth";
 import { useSpace } from "../features/space/hooks/useSpaces";
 import { useBoardsDrawer } from "../features/space/stores/boardsDrawerStore";
+import { ThemeSwitch } from "./ThemeSwitch";
 
 // App chrome: home icon plus the current space, and the signed-in user menu.
 // Inside a space on a narrow screen it also holds the button that opens the
@@ -82,6 +83,7 @@ export function AppHeader() {
           </Menu.Target>
           <Menu.Dropdown>
             {user.email !== null && <Menu.Label>{user.email}</Menu.Label>}
+            <ThemeSwitch />
             <Menu.Item
               color="red"
               leftSection={<LogOut size={14} />}

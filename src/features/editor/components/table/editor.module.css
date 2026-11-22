@@ -55,7 +55,7 @@
 }
 
 .cell:hover {
-  background: color-mix(in oklab, white 4%, transparent);
+  background: color-mix(in oklab, var(--tint) 4%, transparent);
 }
 
 .cell:focus {
@@ -92,7 +92,7 @@
   padding: 0;
   color: var(--color-ac);
   cursor: pointer;
-  background: color-mix(in oklab, var(--color-bg-card) 80%, white 6%);
+  background: color-mix(in oklab, var(--color-bg-card) 80%, var(--tint) 6%);
   border: 1px solid color-mix(in oklab, var(--color-border) 45%, transparent);
   opacity: 0;
   transition:
@@ -135,7 +135,7 @@
   padding: 0;
   color: var(--color-ac);
   cursor: grab;
-  background: color-mix(in oklab, var(--color-bg-card) 80%, white 6%);
+  background: color-mix(in oklab, var(--color-bg-card) 80%, var(--tint) 6%);
   border: 1px solid color-mix(in oklab, var(--color-border) 45%, transparent);
   touch-action: none;
   transition:

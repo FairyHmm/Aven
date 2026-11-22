@@ -28,7 +28,7 @@ const frame = EditorView.theme(
       padding: "0 8px",
       fontFamily: "var(--mantine-font-family-monospace)",
       fontSize: "0.9em",
-      background: "var(--color-bg-deep)",
+      background: "var(--color-code)",
     },
     ".aven-html-b": { fontWeight: "700" },
     ".aven-html-i": { fontStyle: "italic" },

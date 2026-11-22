@@ -24,7 +24,7 @@
 
 /* A card is being dragged over this column. */
 .column[data-over="true"] {
-  background: color-mix(in oklab, var(--color-bg-card) 90%, white);
+  background: color-mix(in oklab, var(--color-bg-card) 90%, var(--tint));
   border-color: color-mix(
     in oklab,
     var(--color-primary-hover) 55%,
@@ -82,7 +82,7 @@
   padding: 1px 7px;
   font-size: 0.72rem;
   text-align: center;
-  background: color-mix(in oklab, white 7%, transparent);
+  background: color-mix(in oklab, var(--tint) 7%, transparent);
   border-radius: 999px;
   color: var(--color-ac);
   font-variant-numeric: tabular-nums;

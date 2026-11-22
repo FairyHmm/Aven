@@ -32,7 +32,7 @@
   font-weight: 650;
   color: var(--color-text);
   text-align: left;
-  background: color-mix(in oklab, white 5%, transparent);
+  background: color-mix(in oklab, var(--tint) 5%, transparent);
 }
 
 .table tr > :first-child {

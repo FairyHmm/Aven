@@ -76,7 +76,7 @@
   padding: 1px 5px;
   font-family: var(--mantine-font-family-monospace);
   font-size: 0.85em;
-  background: var(--color-bg-deep);
+  background: var(--color-code);
   border-radius: 4px;
 }
 

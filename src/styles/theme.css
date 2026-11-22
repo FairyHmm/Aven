@@ -7,6 +7,24 @@
   --color-fg: oklch(44.6% 0.043 257.281); /* slate-600 */
   --color-ac: oklch(70.4% 0.04 256.788); /* slate-400 */
 
+  /* Card tiles sit above their column */
+  --color-tile: color-mix(
+    in oklab,
+    var(--color-bg-card) 55%,
+    var(--color-bg-hover)
+  );
+  --color-tile-hover: color-mix(
+    in oklab,
+    var(--color-bg-card) 40%,
+    var(--color-bg-hover)
+  );
+
+  /* Inline code */
+  --color-code: var(--color-bg-deep);
+
+  /* What lightens a surface in the dark theme and darkens it in the light one */
+  --tint: white;
+
   /* Text */
   --color-text: oklch(98.4% 0.003 247.858); /* slate-50 */
   --color-text-muted: oklch(92.9% 0.013 255.508); /* slate-200 */
@@ -76,6 +94,13 @@
   --accent-amber: var(--color-warning);
   --accent-rose: var(--color-danger);
   --accent-violet: oklch(74% 0.17 305);
+}
+
+/* Changing the theme cross-fades the whole page (app/ThemeSwitch.tsx). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--dur-spatial);
+  animation-timing-function: var(--ease);
 }
 
 /* Anything tagged with an accent exposes it as --accent. */

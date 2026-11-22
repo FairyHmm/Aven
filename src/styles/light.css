@@ -1,0 +1,46 @@
+/* The light theme: the same roles, not the same shades. The page is a pale
+   slate, columns a step darker, tiles and inset fields white; text runs from
+   slate-900 down, and the colours that are text or marks on a dark surface
+   (links, status) take their deeper shades. Mantine's own light slots point at
+   the same tokens, as its dark ones do through theme.ts. */
+:root[data-mantine-color-scheme="light"] {
+  --color-bg: oklch(96.8% 0.007 247.896); /* slate-100 */
+  --color-bg-card: oklch(92.9% 0.013 255.508); /* slate-200 */
+  --color-bg-hover: oklch(86.9% 0.022 252.894); /* slate-300 */
+  --color-bg-deep: oklch(100% 0 0); /* white */
+  --color-fg: oklch(55.4% 0.046 257.417); /* slate-500 */
+  --color-ac: oklch(55.4% 0.046 257.417); /* slate-500 */
+  --color-tile: oklch(100% 0 0);
+  --color-tile-hover: oklch(98.4% 0.003 247.858); /* slate-50 */
+  --color-code: oklch(92.9% 0.013 255.508); /* slate-200 */
+  --tint: black;
+
+  --color-text: oklch(20.8% 0.042 265.755); /* slate-900 */
+  --color-text-muted: oklch(37.2% 0.044 257.287); /* slate-700 */
+  --color-text-subtle: oklch(44.6% 0.043 257.281); /* slate-600 */
+
+  --color-primary-hover: oklch(51.1% 0.262 276.966); /* indigo-600 */
+  --color-primary-muted: oklch(87% 0.065 274.039); /* indigo-200 */
+
+  --color-danger: oklch(58.6% 0.253 17.585); /* rose-600 */
+  --color-success: oklch(50.8% 0.118 165.612); /* emerald-700 */
+  --color-incomplete: oklch(58.8% 0.158 241.966); /* sky-600 */
+  --color-warning: oklch(55.5% 0.163 48.4); /* amber-700 */
+
+  --color-border: oklch(86.9% 0.022 252.894); /* slate-300 */
+  --color-border-hover: oklch(70.4% 0.04 256.788); /* slate-400 */
+
+  --accent-violet: oklch(54% 0.2 305);
+  --accent-indigo: oklch(55% 0.2 277);
+
+  --mantine-color-text: var(--color-text);
+  --mantine-color-bright: var(--color-text);
+  --mantine-color-body: var(--color-bg);
+  --mantine-color-placeholder: var(--color-ac);
+  --mantine-color-anchor: var(--color-primary);
+  --mantine-color-default: var(--color-bg-deep);
+  --mantine-color-default-hover: var(--color-bg-card);
+  --mantine-color-default-color: var(--color-text);
+  --mantine-color-default-border: var(--color-border);
+  --mantine-color-dimmed: var(--color-text-subtle);
+}

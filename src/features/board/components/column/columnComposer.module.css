@@ -31,7 +31,7 @@
 .addButton:hover,
 .addColumn:hover {
   color: var(--color-text);
-  background: color-mix(in oklab, white 6%, transparent);
+  background: color-mix(in oklab, var(--tint) 6%, transparent);
 }
 
 .addButton:focus-visible,
