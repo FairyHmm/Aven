@@ -1,7 +1,7 @@
 import { SortableItem } from "../../../../shared/components/SortableItem";
 import { useCanEdit } from "../../hooks/useCanEdit";
 import { useIsEditing } from "../../hooks/useCardEditor";
-import { useTagFilter } from "../../hooks/useTags";
+import { useNarrowed } from "../../hooks/useNarrowed";
 import type { Card } from "../../lib/types";
 import { CardTile } from "./CardTile";
 
@@ -18,7 +18,7 @@ type Props = {
 export function CardSlot({ card, columnId, index, count }: Props) {
   const editing = useIsEditing(card.id);
   const canEdit = useCanEdit();
-  const { tag } = useTagFilter();
+  const narrowed = useNarrowed();
   return (
     <SortableItem
       kind="card"
@@ -27,7 +27,7 @@ export function CardSlot({ card, columnId, index, count }: Props) {
       axis="vertical"
       index={index}
       count={count}
-      disabled={editing || tag !== undefined || !canEdit}
+      disabled={editing || narrowed || !canEdit}
     >
       <CardTile card={card} />
     </SortableItem>

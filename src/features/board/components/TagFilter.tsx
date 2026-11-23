@@ -1,4 +1,4 @@
-import { Button, Popover } from "@mantine/core";
+import { ActionIcon, Button, Popover } from "@mantine/core";
 import { ListFilter } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -22,6 +22,9 @@ export function TagFilter() {
   const used = useMemo(() => {
     const counts = new Map<string, number>();
     for (const card of cards) {
+      if (card.archivedAt !== undefined) {
+        continue;
+      }
       for (const tag of tagsOf(card.props)) {
         counts.set(tag, (counts.get(tag) ?? 0) + 1);
       }
@@ -37,16 +40,19 @@ export function TagFilter() {
       width={260}
     >
       <Popover.Target>
-        <Button
-          size="compact-xs"
-          variant="default"
-          leftSection={<ListFilter size={13} />}
+        <ActionIcon
+          variant={active === undefined ? "subtle" : "light"}
+          color="gray"
+          size="md"
+          radius="md"
+          aria-label="Filter by label"
+          title="Filter by label"
           onClick={() => {
             setOpened(open => !open);
           }}
         >
-          Filter
-        </Button>
+          <ListFilter size={16} />
+        </ActionIcon>
       </Popover.Target>
       <Popover.Dropdown>
         <div className={picker.picker}>

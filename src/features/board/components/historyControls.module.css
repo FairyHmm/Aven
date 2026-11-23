@@ -1,0 +1,52 @@
+.buttons {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* The line of text eases open by width (0fr to 1fr) and fades, rather than
+   popping in and shoving the toolbar. */
+.note {
+  display: grid;
+  grid-template-columns: 0fr;
+  font-size: 0.8rem;
+  color: var(--color-ac);
+  white-space: nowrap;
+  opacity: 0;
+  transition:
+    grid-template-columns var(--dur-spatial) var(--ease),
+    opacity var(--dur) var(--ease);
+}
+
+.note[data-open="true"] {
+  grid-template-columns: 1fr;
+  opacity: 1;
+}
+
+.inner {
+  min-width: 0;
+  padding-inline-start: var(--space-sm);
+  overflow: hidden;
+}
+
+.action {
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-primary-hover);
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+}
+
+.action:hover,
+.action:focus-visible {
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note {
+    transition: opacity var(--dur-fast) linear;
+  }
+}
