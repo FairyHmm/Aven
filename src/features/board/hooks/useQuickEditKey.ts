@@ -3,28 +3,7 @@ import { useEffect } from "react";
 import type { PopupKind } from "../lib/types";
 import { useBoardStore } from "../stores/boardStore";
 import { useEditorStore } from "../stores/editorStore";
-
-// A card the keyboard is on: the tile under the pointer, or the focused one.
-function targetCard(): string | undefined {
-  const { hoveredId } = useEditorStore.getState();
-  if (hoveredId !== undefined) {
-    return hoveredId;
-  }
-  const focused = document.activeElement;
-  return focused instanceof HTMLElement
-    ? focused.closest<HTMLElement>("[data-card-id]")?.dataset.cardId
-    : undefined;
-}
-
-function isTyping(target: EventTarget | null) {
-  return (
-    target instanceof HTMLElement &&
-    (target.isContentEditable ||
-      target instanceof HTMLInputElement ||
-      target instanceof HTMLTextAreaElement ||
-      target instanceof HTMLSelectElement)
-  );
-}
+import { isTyping, targetCard } from "./keys";
 
 const POPUP_KEYS: Record<string, PopupKind> = {
   l: "labels",

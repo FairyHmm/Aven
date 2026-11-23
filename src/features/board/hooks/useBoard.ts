@@ -4,6 +4,7 @@ import { STORAGE_MODE } from "../../../shared/lib/storageMode";
 import { preloadCodeEditor } from "../../editor/components/CodeEditorLazy";
 import { useCanEditSpace, useSpace } from "../../space/hooks/useSpaces";
 import { sortedColumns } from "../lib/mutations";
+import { useArchiveViewStore } from "../stores/archiveViewStore";
 import { useBoardStore } from "../stores/boardStore";
 import { useEditorStore } from "../stores/editorStore";
 import { useFieldStore } from "../stores/fieldStore";
@@ -38,12 +39,16 @@ export function useBoard(spaceId: string, boardId: string) {
     return () => {
       useBoardStore.getState().actions.unload();
       useEditorStore.getState().close();
-      useFilterStore.getState().clear();
+      useFilterStore.getState().reset();
+      useArchiveViewStore.getState().setOpen(false);
     };
   }, [spaceId, boardId]);
 
   const columns = useBoardStore(state => state.columns);
-  const cardCount = useBoardStore(state => state.cards.length);
+  // Archived cards are set aside, not on the board.
+  const cardCount = useBoardStore(
+    state => state.cards.filter(card => card.archivedAt === undefined).length,
+  );
   const status = useBoardStore(state => state.status);
   const pending = useBoardStore(state => state.pending);
   const error = useBoardStore(state => state.error);

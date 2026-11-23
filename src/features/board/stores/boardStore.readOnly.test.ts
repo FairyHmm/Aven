@@ -7,7 +7,10 @@ const { apply } = vi.hoisted(() => ({
 vi.mock("./storage", () => ({
   storage: { apply, load: vi.fn(), subscribe: undefined },
 }));
-vi.mock("../../../shared/lib/dnd/flip", () => ({ captureLayout: vi.fn() }));
+vi.mock("../../../shared/lib/dnd/flip", () => ({
+  captureLayout: vi.fn(),
+  flyNext: vi.fn(),
+}));
 vi.mock("../../../shared/lib/dnd/glide", () => ({
   ghostOut: vi.fn(),
 }));
