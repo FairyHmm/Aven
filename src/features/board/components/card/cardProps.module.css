@@ -107,6 +107,12 @@ span.tag {
   background: color-mix(in oklab, var(--color-danger) 16%, transparent);
 }
 
+/* Due today or tomorrow. */
+.chip[data-soon] {
+  color: var(--color-warning);
+  background: color-mix(in oklab, var(--color-warning) 16%, transparent);
+}
+
 .chipKey {
   color: var(--color-ac);
 }

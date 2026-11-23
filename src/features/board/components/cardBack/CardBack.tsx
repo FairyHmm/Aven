@@ -1,5 +1,5 @@
 import { Modal } from "@mantine/core";
-import { Trash2 } from "lucide-react";
+import { Archive, Trash2 } from "lucide-react";
 import { useRef, useState } from "react";
 
 import { glideAround } from "../../../../shared/lib/dnd/glide";
@@ -25,7 +25,7 @@ const from = (popup: Popup | undefined, part: Popup["from"]) =>
   popup?.from === part ? popup.kind : undefined;
 
 export function CardBack({ card, onClose }: Props) {
-  const { editCard, removeCard } = useBoardActions();
+  const { editCard, removeCard, archiveCard } = useBoardActions();
   const [title, setTitle] = useState(card.title);
   const [props, setProps] = useState(card.props);
   const [body, setBody] = useState(card.body);
@@ -47,7 +47,7 @@ export function CardBack({ card, onClose }: Props) {
   const escapeHeld = useEscapeHeld();
   const { shown, leave } = useModalLeave(onClose);
 
-  const save = () => {
+  const commitEdits = () => {
     const changed =
       title !== card.title ||
       body !== card.body ||
@@ -55,6 +55,9 @@ export function CardBack({ card, onClose }: Props) {
     if (changed) {
       editCard(card.id, { title, body, props });
     }
+  };
+  const save = () => {
+    commitEdits();
     leave();
   };
 
@@ -156,6 +159,17 @@ export function CardBack({ card, onClose }: Props) {
         }}
       />
       <div className={classes.footer} data-flip="back:footer">
+        <ActionButton
+          compact
+          label="Archive card"
+          icon={<Archive size={14} />}
+          onClick={() => {
+            leave(() => {
+              commitEdits();
+              archiveCard(card.id);
+            });
+          }}
+        />
         <ActionButton
           compact
           danger

@@ -43,11 +43,9 @@ export function ColumnView({ column, index, count }: Props) {
   });
   useAutoScroll(list);
 
+  // No question first: "Column deleted · Undo" brings it back with its cards.
   const remove = () => {
-    const warning = `Delete "${column.name}" and its ${cards.length} card(s)?`;
-    if (cards.length === 0 || window.confirm(warning)) {
-      actions.removeColumn(column.id);
-    }
+    actions.removeColumn(column.id);
   };
 
   return (
@@ -93,6 +91,13 @@ export function ColumnView({ column, index, count }: Props) {
           {canEdit && (
             <ColumnMenu
               accent={column.accent}
+              hasCards={cards.length > 0}
+              onSort={by => {
+                actions.sortColumn(column.id, by);
+              }}
+              onArchiveAll={() => {
+                actions.archiveColumnCards(column.id);
+              }}
               onRename={() => {
                 setRenaming(true);
               }}

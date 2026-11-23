@@ -1,4 +1,6 @@
 import {
+  Archive,
+  ArchiveRestore,
   ArrowRight,
   Check,
   Copy,
@@ -35,7 +37,9 @@ export function QuickMainView({
   const popup = useEditorStore(state => state.popup);
   const setPopup = useEditorStore(state => state.setPopup);
   const open = useEditorStore(state => state.open);
-  const { duplicateCard, removeCard } = useBoardStore(state => state.actions);
+  const { duplicateCard, removeCard, archiveCard, restoreCard } = useBoardStore(
+    state => state.actions,
+  );
   return (
     <>
       <ActionButton
@@ -99,6 +103,26 @@ export function QuickMainView({
           duplicateCard(card.id);
         }}
       />
+      {card.archivedAt === undefined ? (
+        <ActionButton
+          icon={<Archive size={15} />}
+          label="Archive"
+          onClick={() => {
+            // What was typed is kept with the card in the archive.
+            finish();
+            archiveCard(card.id);
+          }}
+        />
+      ) : (
+        <ActionButton
+          icon={<ArchiveRestore size={15} />}
+          label="Restore"
+          onClick={() => {
+            finish();
+            restoreCard(card.id);
+          }}
+        />
+      )}
       <ActionButton
         icon={<Trash2 size={15} />}
         label="Delete"

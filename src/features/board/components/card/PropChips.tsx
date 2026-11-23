@@ -12,7 +12,8 @@ import { useLinks } from "../../hooks/useFields";
 import { useTagColors } from "../../hooks/useTags";
 import { attrsOf } from "../../lib/labels/labelColors";
 import { colorOf, tagText } from "../../lib/labels/tags";
-import { datesOf, isPast } from "../../lib/props/defaults";
+import { datesOf } from "../../lib/props/defaults";
+import { dueState, dueWord } from "../../lib/props/dueState";
 import { formatDate, kindOf } from "../../lib/props/propView";
 import type { Props } from "../../lib/types";
 import { useFieldStore } from "../../stores/fieldStore";
@@ -84,18 +85,20 @@ export function DateChip({
   onProps: ((props: Props) => void) | undefined;
 }) {
   const { start, due, repeat, reminder } = datesOf(props);
+  const state = dueState(due);
   const label =
     start !== "" && due !== ""
       ? `${formatDate(start, undefined, undefined, false)} – ${formatDate(due, undefined, undefined, false)}`
       : due !== ""
-        ? formatDate(due, undefined, undefined, false)
+        ? (dueWord(due) ?? formatDate(due, undefined, undefined, false))
         : `From ${formatDate(start, undefined, undefined, false)}`;
   const render = (act: (() => void) | undefined) => (
     <span
       className={classes.chip}
       {...leaves(scope, "dates")}
       {...(act === undefined ? {} : pressable(act))}
-      data-overdue={due !== "" && isPast(due) ? "" : undefined}
+      data-overdue={state === "overdue" ? "" : undefined}
+      data-soon={state === "today" || state === "soon" ? "" : undefined}
       title={[
         start !== "" ? `Starts ${start}` : "",
         due !== "" ? `Due ${due}` : "",
