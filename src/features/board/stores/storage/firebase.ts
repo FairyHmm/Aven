@@ -67,6 +67,9 @@ function toCard(id: string, data: DocumentData): Card {
     ...(typeof data.height === "number" ? { height: data.height } : {}),
     order: text(data.order, "a0"),
     ...(attachments !== undefined ? { attachments } : {}),
+    ...(typeof data.archivedAt === "number"
+      ? { archivedAt: data.archivedAt }
+      : {}),
     createdAt: num(data.createdAt, 0),
     updatedAt: num(data.updatedAt, 0),
   };

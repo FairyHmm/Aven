@@ -20,11 +20,14 @@ export function sortedColumns(data: Pick<BoardData, "columns">): Column[] {
   return [...data.columns].sort(byOrder);
 }
 
+// The cards a column shows: archived ones are set aside.
 export function cardsOf(
   data: Pick<BoardData, "cards">,
   columnId: string,
 ): Card[] {
-  return data.cards.filter(card => card.columnId === columnId).sort(byOrder);
+  return data.cards
+    .filter(card => card.columnId === columnId && card.archivedAt === undefined)
+    .sort(byOrder);
 }
 
 export function addColumn(data: BoardData, name: string): BoardPatch {
@@ -76,7 +79,10 @@ export function recolorColumn(
 export function removeColumn(data: BoardData, id: string): BoardPatch {
   return patchOf({
     removeColumns: [id],
-    removeCards: cardsOf(data, id).map(card => card.id),
+    // Archived cards go with their column.
+    removeCards: data.cards
+      .filter(card => card.columnId === id)
+      .map(card => card.id),
   });
 }
 

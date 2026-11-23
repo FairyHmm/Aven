@@ -64,6 +64,9 @@ export type Card = {
   height?: number;
   order: string;
   attachments?: Attachment[];
+  // When it was archived: set aside, off the board, still in its column's
+  // data until it is restored or deleted. Unset = on the board.
+  archivedAt?: number;
   createdAt: number;
   updatedAt: number;
 };
