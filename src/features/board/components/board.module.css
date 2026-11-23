@@ -1,8 +1,32 @@
 .toolbar {
   display: flex;
   flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
   align-items: baseline;
-  gap: 4px 12px;
+  min-width: 0;
+}
+
+/* Quiet icon buttons, set apart in groups by hairlines. */
+.tools {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-inline-start: auto;
+}
+
+.divider {
+  width: 1px;
+  height: 18px;
+  margin-inline: 4px;
+  background: var(--color-border);
 }
 
 .title {
@@ -15,10 +39,21 @@
 
 .meta {
   margin: 0;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   white-space: nowrap;
   color: var(--color-ac);
   font-variant-numeric: tabular-nums;
+}
+
+/* The stage and what floats over it (the archive panel). */
+.stageWrap {
+  position: relative;
+
+  /* The archive panel waits just off this edge while closed; without this it
+     would make the whole page scroll sideways. The margin leaves the room the
+     columns' landing glow needs. */
+  overflow-x: clip;
+  overflow-clip-margin: 8px;
 }
 
 /* Horizontal scroller that holds the columns. Scrolling clips at its edge, so

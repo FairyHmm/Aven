@@ -7,12 +7,16 @@ import { useSortableDrop } from "../../../shared/hooks/useSortableDrop";
 import { useSortableList } from "../../../shared/hooks/useSortableList";
 import { useBoard } from "../hooks/useBoard";
 import { useBoardActions } from "../hooks/useBoardActions";
+import { useBoardKeys } from "../hooks/useBoardKeys";
 import { useCanEdit } from "../hooks/useCanEdit";
 import { useQuickEditKey } from "../hooks/useQuickEditKey";
+import { useUndoKeys } from "../hooks/useUndoKeys";
 import { BoardToolbar } from "./BoardToolbar";
 import { CardEditorModal } from "./cardBack/CardEditorModal";
 import { AddColumn } from "./column/AddColumn";
+import { ArchiveColumn } from "./column/ArchiveColumn";
 import { ColumnView } from "./column/ColumnView";
+import { ShortcutsHelp } from "./ShortcutsHelp";
 
 import classes from "./board.module.css";
 
@@ -21,6 +25,8 @@ type Props = { spaceId: string; boardId: string; name: string };
 export function BoardView({ spaceId, boardId, name }: Props) {
   const board = useBoard(spaceId, boardId);
   useQuickEditKey();
+  useUndoKeys();
+  useBoardKeys();
   const actions = useBoardActions();
   const canEdit = useCanEdit();
   const stage = useRef<HTMLDivElement>(null);
@@ -63,35 +69,39 @@ export function BoardView({ spaceId, boardId, name }: Props) {
         </Alert>
       )}
 
-      <div ref={stage} className={classes.stage}>
-        <div
-          ref={lane}
-          className={classes.lane}
-          aria-busy={board.status === "loading"}
-        >
-          {board.status === "loading" ? (
-            <>
-              <div className={classes.skeleton} />
-              <div className={classes.skeleton} />
-              <div className={classes.skeleton} />
-            </>
-          ) : (
-            <>
-              {board.columns.map((column, index) => (
-                <ColumnView
-                  key={column.id}
-                  column={column}
-                  index={index}
-                  count={board.columns.length}
-                />
-              ))}
-              {canEdit && <AddColumn />}
-            </>
-          )}
+      <div className={classes.stageWrap}>
+        <div ref={stage} className={classes.stage}>
+          <div
+            ref={lane}
+            className={classes.lane}
+            aria-busy={board.status === "loading"}
+          >
+            {board.status === "loading" ? (
+              <>
+                <div className={classes.skeleton} />
+                <div className={classes.skeleton} />
+                <div className={classes.skeleton} />
+              </>
+            ) : (
+              <>
+                {board.columns.map((column, index) => (
+                  <ColumnView
+                    key={column.id}
+                    column={column}
+                    index={index}
+                    count={board.columns.length}
+                  />
+                ))}
+                {canEdit && <AddColumn />}
+              </>
+            )}
+          </div>
         </div>
+        {canEdit && <ArchiveColumn />}
       </div>
 
       <CardEditorModal />
+      <ShortcutsHelp />
     </Stack>
   );
 }
