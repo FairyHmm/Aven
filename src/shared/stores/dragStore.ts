@@ -12,6 +12,9 @@ type DragState = {
   // Position of the dragged item in that same list, or -1 when it comes from
   // another list. It is lifted out of the layout while dragged.
   from: number;
+  // Set while the pointer is over a "sink": a button that takes the dragged
+  // item in (the archive button) rather than a list it would be placed in.
+  sink: HTMLElement | undefined;
   setTarget: (
     kind: string,
     listId: string,
@@ -19,6 +22,7 @@ type DragState = {
     size: number,
     from: number,
   ) => void;
+  aimAtSink: (kind: string, listId: string, element: HTMLElement) => void;
   clearFrom: (kind: string, listId: string) => void;
   end: () => void;
 };
@@ -29,6 +33,7 @@ const CLEARED = {
   index: -1,
   size: 0,
   from: -1,
+  sink: undefined,
 } as const;
 
 export const useDragStore = create<DragState>()((set, get) => ({
@@ -43,7 +48,18 @@ export const useDragStore = create<DragState>()((set, get) => ({
       state.size !== size ||
       state.from !== from
     ) {
-      set({ kind, listId, index, size, from });
+      set({ kind, listId, index, size, from, sink: undefined });
+    }
+  },
+
+  aimAtSink: (kind, listId, element) => {
+    const state = get();
+    if (
+      state.kind !== kind ||
+      state.listId !== listId ||
+      state.sink !== element
+    ) {
+      set({ kind, listId, index: 0, size: 0, from: -1, sink: element });
     }
   },
 

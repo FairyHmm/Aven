@@ -68,14 +68,56 @@ export function takeFrom(key: string): From | undefined {
   return from;
 }
 
+// Items that, if the next change moves them, fly above the board to their new
+// place (see fly.ts) instead of gliding in place: the ones the change is
+// about, such as a card undone back to another column.
+let flying = new Set<string>();
+let flyTimer: number | undefined;
+
+export function flyNext(keys: string[]): void {
+  flying = new Set(keys);
+  window.clearTimeout(flyTimer);
+  flyTimer = window.setTimeout(() => {
+    flying = new Set();
+  }, 500);
+}
+
+export function takeFly(key: string): boolean {
+  return flying.delete(key);
+}
+
+// Items that take the keyboard focus as soon as they are drawn again: a card
+// moved by key is a new element in its new column, and has to be focused
+// before it flies so that its picture can carry the focus ring.
+let focusing = new Set<string>();
+let focusTimer: number | undefined;
+
+export function focusNext(keys: string[]): void {
+  focusing = new Set(keys);
+  window.clearTimeout(focusTimer);
+  focusTimer = window.setTimeout(() => {
+    focusing = new Set();
+  }, 500);
+}
+
+export function takeFocus(key: string): boolean {
+  return focusing.delete(key);
+}
+
 // True once a committed render has picked up the held position of `key`.
 export function wasConsumed(key: string): boolean {
   return consumed.has(key);
 }
 
-// A soft ring that fades out on whatever just landed, so the eye finds it.
+// A soft ring that fades out on whatever just landed, so the eye finds it
+// (unless it has the focus ring already).
 export function flash(element: Element): void {
   const target = element.firstElementChild ?? element;
+  // A card that has the keyboard focus already wears a ring, and this one
+  // would fight it for the outline (fading it out, then snapping it back).
+  if (target.matches(":focus-visible")) {
+    return;
+  }
   target.animate(
     [
       {

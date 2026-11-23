@@ -4,8 +4,11 @@ import {
   EASE,
   isSettling,
   prefersReducedMotion,
+  takeFly,
+  takeFocus,
   takeFrom,
 } from "../lib/dnd/flip";
+import { fly } from "../lib/dnd/fly";
 import { ms } from "../lib/motion";
 
 type Options = {
@@ -36,19 +39,27 @@ export function useFlip(
     }
 
     const from = takeFrom(key);
+    const flies = takeFly(key);
+    if (takeFocus(key) && element.firstElementChild instanceof HTMLElement) {
+      element.firstElementChild.focus({ preventScroll: true });
+    }
     if (from !== undefined) {
       if (!from.held) {
         const to = element.getBoundingClientRect();
         const dx = from.rect.left - to.left;
         const dy = from.rect.top - to.top;
         if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
-          element.animate(
-            [
-              { transform: `translate(${dx}px, ${dy}px)` },
-              { transform: "translate(0, 0)" },
-            ],
-            { duration: ms("base"), easing: EASE },
-          );
+          if (flies) {
+            fly(element, from.rect, to);
+          } else {
+            element.animate(
+              [
+                { transform: `translate(${dx}px, ${dy}px)` },
+                { transform: "translate(0, 0)" },
+              ],
+              { duration: ms("base"), easing: EASE },
+            );
+          }
         }
       }
     } else if (first && (enterOnLoad || !isSettling())) {

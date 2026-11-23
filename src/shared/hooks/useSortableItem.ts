@@ -165,16 +165,25 @@ export function useSortableItem(
           setPhase("idle");
           return;
         }
+        // The sink it was dropped on, if any: read now, before the drop ends.
+        const sink = useDragStore.getState().sink;
         current.freeze();
         // Back to full size (so its new place is measured), but unseen until
         // the clone has landed on it.
         setPhase("settling");
-        settle(current, key, element, () => {
-          // Synchronous, so the item is on screen before the clone is removed.
-          flushSync(() => {
-            setPhase("idle");
-          });
-        });
+        settle(
+          current,
+          key,
+          element,
+          () => {
+            // Synchronous, so the item is on screen before the clone is
+            // removed.
+            flushSync(() => {
+              setPhase("idle");
+            });
+          },
+          sink,
+        );
       },
     });
   }, [ref, kind, id, listId, handle]);
